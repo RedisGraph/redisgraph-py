@@ -18,7 +18,7 @@ redis_graph.add_node(john)
 japan = Node(label='country', properties={'name': 'Japan'})
 redis_graph.add_node(japan)
 
-edge = Edge(john, 'visited', japan, 'purpose', 'pleasure')
+edge = Edge(john, 'visited', japan, properties={'purpose': 'pleasure'})
 redis_graph.add_edge(edge)
 
 redis_graph.commit()

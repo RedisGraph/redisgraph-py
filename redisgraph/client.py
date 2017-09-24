@@ -32,20 +32,16 @@ class Edge(object):
     """
     An edge connecting two nodes.
     """
-    def __init__(self, src_node, relation, dest_node, *args):
+    def __init__(self, src_node, relation, dest_node, properties=None):
         """
         Create a new edge.
         """
         assert src_node is not None and dest_node is not None
 
         self.relation = relation
-        self.properties = {}
+        self.properties = properties if properties != None else {}
         self.src_node = src_node
         self.dest_node = dest_node
-
-        args = list(args)
-        for i in range(0, len(args), 2):
-            self.properties[args[i]] = args[i+1]
 
     def __str__(self):
         if len(self.properties) > 0:
@@ -106,7 +102,7 @@ class Graph(object):
         if query[-1] is ',':
             query = query[:-1]
 
-        return self.redis_con.execute_command("GRAPH.QUERY", self.name, query)
+        return self.query(query)
 
     def query(self, q):
         """
