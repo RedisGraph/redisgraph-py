@@ -108,18 +108,24 @@ class Graph(object):
         """
         Executes a query against the graph.
         """
-        resultset = self.redis_con.execute_command("GRAPH.QUERY", self.name, q)
+        response = self.redis_con.execute_command("GRAPH.QUERY", self.name, q)
+        resultset = response[0]
+        statistics = response[1]
         columns = resultset[0].split(",")
         resultset = resultset[1:]
         tbl = PrettyTable(columns)
 
         for idx, result in enumerate(resultset):
-            if idx < len(resultset)-1:
-                tbl.add_row(result.split(","))
+            tbl.add_row(result.split(","))
+
+        if len(resultset) == 0:
+            tbl.add_row(['No data returned.'])
 
         print tbl
-        # Last record holds internal execution time.
-        print resultset[len(resultset)-1]
+
+        for stat in statistics:
+            print stat
+
         return tbl
 
     def execution_plan(self, query):
