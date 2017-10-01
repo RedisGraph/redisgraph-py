@@ -60,6 +60,31 @@ class Graph(object):
     """
     Graph, collection of nodes and edges.
     """
+
+    class QueryResult(object):
+        def __init__(self, result_set, statistics):
+            self.result_set = result_set
+            self.statistics = statistics
+
+        """Prints the data from the query response:
+           1. First row result_set contains the columns names. Thus the first row in PrettyTable
+              will contain the columns.
+           2. The row after that will contain the data returned, or 'No Data returned' if there is none.
+           3. Prints the statistics of the query.
+        """
+        def pretty_print(self):
+            tbl = PrettyTable(self.result_set[0])
+            for row in self.result_set[1:]:
+                tbl.add_row(row)
+
+            if len(self.result_set) == 1:
+                tbl.add_row(['No data returned.'])
+
+            print(str(tbl) + '\n')
+
+            for stat in self.statistics:
+                print(stat)
+
     def __init__(self, name, redis_con):
         """
         Create a new graph.
@@ -109,24 +134,10 @@ class Graph(object):
         Executes a query against the graph.
         """
         response = self.redis_con.execute_command("GRAPH.QUERY", self.name, q)
-        resultset = response[0]
+        data = response[0]
         statistics = response[1]
-        columns = resultset[0].split(",")
-        resultset = resultset[1:]
-        tbl = PrettyTable(columns)
-
-        for idx, result in enumerate(resultset):
-            tbl.add_row(result.split(","))
-
-        if len(resultset) == 0:
-            tbl.add_row(['No data returned.'])
-
-        print tbl
-
-        for stat in statistics:
-            print stat
-
-        return tbl
+        result_set = [res.split(',') for res in data]
+        return self.QueryResult(result_set, statistics)
 
     def execution_plan(self, query):
         """
