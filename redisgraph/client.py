@@ -1,13 +1,15 @@
-import redis
 import random
 import string
-from prettytable import PrettyTable
+
+from query_result import QueryResult
+
 
 def random_string(length=10):
     """
     Returns a random N chracter long string.
     """
     return ''.join(random.choice(string.lowercase) for x in range(length))
+
 
 class Node(object):
     """
@@ -27,6 +29,7 @@ class Node(object):
             alias=self.alias,
             label=self.label,
             properties=','.join(key+':'+str(val) for key, val in self.properties.iteritems()))
+
 
 class Edge(object):
     """
@@ -56,34 +59,11 @@ class Edge(object):
                 relation=self.relation,
                 dest_alias=self.dest_node.alias)
 
+
 class Graph(object):
     """
     Graph, collection of nodes and edges.
     """
-
-    class QueryResult(object):
-        def __init__(self, result_set, statistics):
-            self.result_set = result_set
-            self.statistics = statistics
-
-        """Prints the data from the query response:
-           1. First row result_set contains the columns names. Thus the first row in PrettyTable
-              will contain the columns.
-           2. The row after that will contain the data returned, or 'No Data returned' if there is none.
-           3. Prints the statistics of the query.
-        """
-        def pretty_print(self):
-            tbl = PrettyTable(self.result_set[0])
-            for row in self.result_set[1:]:
-                tbl.add_row(row)
-
-            if len(self.result_set) == 1:
-                tbl.add_row(['No data returned.'])
-
-            print(str(tbl) + '\n')
-
-            for stat in self.statistics:
-                print(stat)
 
     def __init__(self, name, redis_con):
         """
@@ -137,7 +117,7 @@ class Graph(object):
         data = response[0]
         statistics = response[1]
         result_set = [res.split(',') for res in data]
-        return self.QueryResult(result_set, statistics)
+        return QueryResult(result_set, statistics)
 
     def execution_plan(self, query):
         """
