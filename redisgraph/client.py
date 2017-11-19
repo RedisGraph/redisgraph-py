@@ -1,14 +1,14 @@
 import random
 import string
 
-from query_result import QueryResult
+from .query_result import QueryResult
 
 
 def random_string(length=10):
     """
     Returns a random N chracter long string.
     """
-    return ''.join(random.choice(string.lowercase) for x in range(length))
+    return ''.join(random.choice(string.ascii_lowercase) for x in range(length))
 
 
 class Node(object):
@@ -28,7 +28,7 @@ class Node(object):
         return '({alias}:{label} {{{properties}}})'.format(
             alias=self.alias,
             label=self.label,
-            properties=','.join(key+':'+str(val) for key, val in self.properties.iteritems()))
+            properties=','.join(key+':'+str(val) for key, val in self.properties.items()))
 
 
 class Edge(object):
@@ -51,7 +51,7 @@ class Edge(object):
             return '({src_alias})-[:{relation} {{{properties}}}]->({dest_alias})'.format(
                 src_alias=self.src_node.alias,
                 relation=self.relation,
-                properties=','.join(key+':'+str(val) for key, val in self.properties.iteritems()),
+                properties=','.join(key+':'+str(val) for key, val in self.properties.items()),
                 dest_alias=self.dest_node.alias)
         else:
             return '({src_alias})-[:{relation}]->({dest_alias})'.format(
@@ -97,7 +97,7 @@ class Graph(object):
         """
 
         query = 'CREATE '
-        for _, node in self.nodes.iteritems():
+        for _, node in self.nodes.items():
             query += str(node) + ','
 
         for edge in self.edges:
