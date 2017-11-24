@@ -23,8 +23,8 @@ redis_graph.add_edge(edge)
 
 redis_graph.commit()
 
-query = """MATCH (p:person)-[v:visited {purpose:pleasure}]->(c:country)
-    	   RETURN p.name, p.age, v.purpose, c.name"""
+query = """MATCH (p:person)-[v:visited {purpose:"pleasure"}]->(c:country)
+		   RETURN p.name, p.age, v.purpose, c.name"""
 
 redis_graph.query(query)
 ```

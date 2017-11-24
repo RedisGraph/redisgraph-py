@@ -10,6 +10,22 @@ def random_string(length=10):
     """
     return ''.join(random.choice(string.ascii_lowercase) for x in range(length))
 
+def quote_string(prop):
+    """
+    RedisGraph strings must be quoted,
+    quote_string wraps given prop with quotes incase
+    prop is a string.
+    """
+    if not isinstance(prop, str):
+        return prop
+
+    if prop[0] != '"':
+        prop = '"' + prop
+
+    if prop[-1] != '"':
+        prop = prop + '"'
+
+    return prop
 
 class Node(object):
     """
@@ -28,7 +44,7 @@ class Node(object):
         return '({alias}:{label} {{{properties}}})'.format(
             alias=self.alias,
             label=self.label,
-            properties=','.join(key+':'+str(val) for key, val in self.properties.items()))
+            properties=','.join(key+':'+str(quote_string(val)) for key, val in self.properties.items()))
 
 
 class Edge(object):
@@ -51,7 +67,7 @@ class Edge(object):
             return '({src_alias})-[:{relation} {{{properties}}}]->({dest_alias})'.format(
                 src_alias=self.src_node.alias,
                 relation=self.relation,
-                properties=','.join(key+':'+str(val) for key, val in self.properties.items()),
+                properties=','.join(key+':'+str(quote_string(val)) for key, val in self.properties.items()),
                 dest_alias=self.dest_node.alias)
         else:
             return '({src_alias})-[:{relation}]->({dest_alias})'.format(
