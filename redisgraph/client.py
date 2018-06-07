@@ -129,10 +129,17 @@ class Graph(object):
         """
         Executes a query against the graph.
         """
+        statistics = None
+        result_set = None
         response = self.redis_con.execute_command("GRAPH.QUERY", self.name, q)
-        data = response[0]
-        statistics = response[1]
-        result_set = [res.decode().split(',') for res in data]
+
+        if len(response) == 1:
+            statistics = response[0]
+        else:
+            data = response[0]
+            statistics = response[1]
+            result_set = [res.decode().split(',') for res in data]
+
         return QueryResult(result_set, statistics)
 
     def execution_plan(self, query):

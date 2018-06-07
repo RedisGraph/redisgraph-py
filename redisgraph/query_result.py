@@ -22,14 +22,15 @@ class QueryResult(object):
        3. Prints the statistics of the query.
     """
     def pretty_print(self):
-        tbl = PrettyTable(self.result_set[0])
-        for row in self.result_set[1:]:
-            tbl.add_row(row)
+        if self.result_set is not None:
+            tbl = PrettyTable(self.result_set[0])
+            for row in self.result_set[1:]:
+                tbl.add_row(row)
 
-        if len(self.result_set) == 1:
-            tbl.add_row(['No data returned.'])
+            if len(self.result_set) == 1:
+                tbl.add_row(['No data returned.'])
 
-        print(str(tbl) + '\n')
+            print(str(tbl) + '\n')
 
         for stat in self.statistics:
             print(stat)
