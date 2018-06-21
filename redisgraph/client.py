@@ -134,7 +134,10 @@ class Graph(object):
         response = self.redis_con.execute_command("GRAPH.QUERY", self.name, q)
 
         if len(response) == 1:
-            statistics = response[0]
+            if isinstance(response[0], str):
+                statistics = response
+            else:
+                statistics = response[0]
         else:
             data = response[0]
             statistics = response[1]
