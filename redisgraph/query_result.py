@@ -5,6 +5,8 @@ class QueryResult(object):
 
     LABELS_ADDED = 'Labels added'
     NODES_CREATED = 'Nodes created'
+    NODES_DELETED = 'Nodes deleted'
+    RELATIONSHIPS_DELETED = 'Relationships deleted'
     PROPERTIES_SET = 'Properties set'
     RELATIONSHIPS_CREATED = 'Relationships created'
     INTERNAL_EXECUTION_TIME = 'internal execution time'
@@ -41,6 +43,8 @@ class QueryResult(object):
             self.NODES_CREATED: self._get_value(self.NODES_CREATED, statistics),
             self.PROPERTIES_SET: self._get_value(self.PROPERTIES_SET, statistics),
             self.RELATIONSHIPS_CREATED: self._get_value(self.RELATIONSHIPS_CREATED, statistics),
+            self.NODES_DELETED: self._get_value(self.NODES_DELETED, statistics),
+            self.RELATIONSHIPS_DELETED: self._get_value(self.RELATIONSHIPS_DELETED, statistics),
             self.INTERNAL_EXECUTION_TIME: self._get_value(self.INTERNAL_EXECUTION_TIME, statistics)
         }
 
@@ -62,12 +66,20 @@ class QueryResult(object):
         return self.parsed_statistics[self.NODES_CREATED]
 
     @property
+    def nodes_deleted(self):
+        return self.parsed_statistics[self.NODES_DELETED]
+
+    @property
     def properties_set(self):
         return self.parsed_statistics[self.PROPERTIES_SET]
 
     @property
     def relationships_created(self):
         return self.parsed_statistics[self.RELATIONSHIPS_CREATED]
+
+    @property
+    def relationships_deleted(self):
+        return self.parsed_statistics[self.RELATIONSHIPS_DELETED]
 
     @property
     def run_time_ms(self):

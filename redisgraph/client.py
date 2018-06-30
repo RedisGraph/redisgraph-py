@@ -3,7 +3,6 @@ import string
 
 from .query_result import QueryResult
 
-
 def random_string(length=10):
     """
     Returns a random N chracter long string.
@@ -46,7 +45,6 @@ class Node(object):
             label=self.label,
             properties=','.join(key+':'+str(quote_string(val)) for key, val in self.properties.items()))
 
-
 class Edge(object):
     """
     An edge connecting two nodes.
@@ -74,7 +72,6 @@ class Edge(object):
                 src_alias=self.src_node.alias,
                 relation=self.relation,
                 dest_alias=self.dest_node.alias)
-
 
 class Graph(object):
     """
