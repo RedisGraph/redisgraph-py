@@ -37,13 +37,22 @@ class Node(object):
         self.id = node_id
         self.alias = alias
         self.label = label
-        self.properties = properties
+        self.properties = {} or properties
 
     def __str__(self):
-        return '({alias}:{label} {{{properties}}})'.format(
-            alias=self.alias,
-            label=self.label,
-            properties=','.join(key+':'+str(quote_string(val)) for key, val in self.properties.items()))
+
+        res = '('
+        if self.alias:
+            res += self.alias
+        if self.label:
+            res += ':' + self.label
+        if self.properties:
+            props = ','.join(key+':'+str(quote_string(val)) for key, val in self.properties.items())
+            res += '{' + props + '}'
+        res += ')'
+
+        return res
+
 
 class Edge(object):
     """
@@ -55,23 +64,28 @@ class Edge(object):
         """
         assert src_node is not None and dest_node is not None
 
-        self.relation = relation
-        self.properties = properties if properties != None else {}
+        self.relation = '' or relation
+        self.properties = {} or properties
         self.src_node = src_node
         self.dest_node = dest_node
 
     def __str__(self):
-        if len(self.properties) > 0:
-            return '({src_alias})-[:{relation} {{{properties}}}]->({dest_alias})'.format(
-                src_alias=self.src_node.alias,
-                relation=self.relation,
-                properties=','.join(key+':'+str(quote_string(val)) for key, val in self.properties.items()),
-                dest_alias=self.dest_node.alias)
-        else:
-            return '({src_alias})-[:{relation}]->({dest_alias})'.format(
-                src_alias=self.src_node.alias,
-                relation=self.relation,
-                dest_alias=self.dest_node.alias)
+        # Source node.
+        res = '(' + self.src_node.alias + ')'
+
+        # Edge
+        res += "-["
+        if self.relation:
+            res += ":" + self.relation
+        if self.properties:
+            props = ','.join(key+':'+str(quote_string(val)) for key, val in self.properties.items())
+            res += '{' + props + '}'
+        res += ']->'
+
+        # Dest node.
+        res += '(' + self.dest_node.alias + ')'
+
+        return res
 
 class Graph(object):
     """
