@@ -53,7 +53,6 @@ class Node(object):
 
         return res
 
-
 class Edge(object):
     """
     An edge connecting two nodes.
@@ -144,12 +143,9 @@ class Graph(object):
         result_set = None
         response = self.redis_con.execute_command("GRAPH.QUERY", self.name, q)
 
-        if len(response) == 1:
-            statistics = response[0]
-        else:
-            data = response[0]
-            statistics = response[1]
-            result_set = [res.decode().split(',') for res in data]
+        data = response[0]
+        statistics = response[1]
+        result_set = [res.decode().split(',') for res in data]
 
         return QueryResult(result_set, statistics)
 

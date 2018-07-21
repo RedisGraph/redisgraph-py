@@ -24,7 +24,7 @@ class QueryResult(object):
        3. Prints the statistics of the query.
     """
     def pretty_print(self):
-        if self.result_set is not None:
+        if not self.is_empty():
             tbl = PrettyTable(self.result_set[0])
             for row in self.result_set[1:]:
                 tbl.add_row(row)
@@ -36,6 +36,9 @@ class QueryResult(object):
 
         for stat in self.statistics:
             print(stat)
+
+    def is_empty(self):
+        return len(self.result_set) == 0
 
     def _retrieve_data_from_statistics(self, statistics):
         return {
