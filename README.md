@@ -26,7 +26,17 @@ redis_graph.commit()
 query = """MATCH (p:person)-[v:visited {purpose:"pleasure"}]->(c:country)
 		   RETURN p.name, p.age, v.purpose, c.name"""
 
-redis_graph.query(query)
+result = redis_graph.query(query)
+
+# Print resultset
+result.pretty_print()
+
+# Iterate through resultset, skip header row at position 0
+for record in result.result_set[1:]:
+	person_name = record[0]
+	person_age = record[1]
+	visit_purpose = record[2]
+	country_name = record[3]
 ```
 
 # Installing
