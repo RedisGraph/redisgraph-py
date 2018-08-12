@@ -153,3 +153,9 @@ class Graph(object):
         Get the execution plan for given query.
         """
         return self.redis_con.execute_command("GRAPH.EXPLAIN", self.name, query)
+
+    def delete(self):
+        """
+        Deletes graph.
+        """
+        return self.redis_con.execute_command("GRAPH.DELETE", self.name)
