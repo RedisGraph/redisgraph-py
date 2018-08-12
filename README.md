@@ -37,6 +37,10 @@ for record in result.result_set[1:]:
 	person_age = record[1]
 	visit_purpose = record[2]
 	country_name = record[3]
+
+
+# All done, remove graph.
+redis_graph.delete()
 ```
 
 # Installing
