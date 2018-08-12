@@ -4,7 +4,7 @@ setup(
     version='1.5',
 
     description='RedisGraph Python Client',
-    url='https://github.com/swilly22/redisgraph-py',
+    url='https://github.com/redislabs/redisgraph-py',
     packages=find_packages(),
     install_requires=['redis', 'PTable'],
     classifiers=[
