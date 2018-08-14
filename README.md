@@ -1,3 +1,5 @@
+[![PyPI version](https://badge.fury.io/py/redisgraph.svg)](https://badge.fury.io/py/redisgraph)
+
 # redisgraph-py
 RedisGraph python client
 
