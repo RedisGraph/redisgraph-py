@@ -159,3 +159,14 @@ class Graph(object):
         Deletes graph.
         """
         return self.redis_con.execute_command("GRAPH.DELETE", self.name)
+    
+    def merge(self, pattern):
+        """
+        Merge a node or relation.
+        """
+
+        query = 'MERGE '
+        if object:
+            query += str(pattern)
+
+        return self.query(query)
