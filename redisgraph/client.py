@@ -117,12 +117,15 @@ class Graph(object):
         assert self.nodes[edge.src_node.alias] is not None and self.nodes[edge.dest_node.alias] is not None
         self.edges.append(edge)
 
-    def commit(self):
+    def commit(self, merge=False):
         """
         Create entire graph.
         """
+        if merge:
+            query = 'MERGE '
+        else:
+            query = 'CREATE '
 
-        query = 'CREATE '
         for _, node in self.nodes.items():
             query += str(node) + ','
 
@@ -134,6 +137,12 @@ class Graph(object):
             query = query[:-1]
 
         return self.query(query)
+    
+    def merge(self):
+        """
+        Merge entire graph.
+        """
+        return self.commit(True)    
 
     def query(self, q):
         """
