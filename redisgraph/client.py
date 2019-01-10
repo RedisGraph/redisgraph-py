@@ -135,6 +135,17 @@ class Graph(object):
 
         return self.query(query)
 
+    def flush(self):
+        """
+        Commit the graph and reset the edges and nodes to zero length
+        """
+        try:
+            self.commit()
+            self.nodes = {}
+            self.edges = []
+        except:
+            print("Error flushing graph")
+
     def query(self, q):
         """
         Executes a query against the graph.
