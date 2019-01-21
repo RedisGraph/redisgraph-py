@@ -1,7 +1,7 @@
 from setuptools import setup, find_packages
 setup(
     name='redisgraph',
-    version='1.6',
+    version='1.7',
 
     description='RedisGraph Python Client',
     url='https://github.com/redislabs/redisgraph-py',

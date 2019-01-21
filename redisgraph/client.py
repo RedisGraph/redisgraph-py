@@ -173,7 +173,7 @@ class Graph(object):
     
     def merge(self, pattern):
         """
-        Merge a node or relation.
+        Merge pattern.
         """
 
         query = 'MERGE '
