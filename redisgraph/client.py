@@ -166,7 +166,6 @@ class Graph(object):
         """
 
         query = 'MERGE '
-        if object:
-            query += str(pattern)
+        query += str(pattern)
 
         return self.query(query)
