@@ -54,7 +54,8 @@ class QueryResult(object):
     @staticmethod
     def _get_value(prop, statistics):
         for stat in statistics:
-            stat = stat.decode()
+            if isinstance(stat,bytes):
+                stat = stat.decode()
             if prop in stat:
                 return float(stat.split(': ')[1].split(' ')[0])
 
