@@ -22,7 +22,6 @@ class Node(object):
         return res
 
     def __str__(self):
-
         res = '('
         if self.alias:
             res += self.alias

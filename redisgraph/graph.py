@@ -14,6 +14,52 @@ class Graph(object):
         self.nodes = {}
         self.edges = []
 
+        self._labels = []            # List of node labels.
+        self._relationshipTypes = [] # List of relation types.
+        self._properties = []        # List of properties.
+
+    def get_label(self, idx):
+        try:
+            label = self._labels[idx]
+        except IndexError:
+            # Refresh graph labels.
+            lbls = self.labels()
+            # Unpack data.
+            self._labels = [None] * len(lbls)
+            for i, l in enumerate(lbls):
+                self._labels[i] = l[0]
+
+            label = self._labels[idx]
+        return label
+
+    def get_relation(self, idx):
+        try:
+            relationshipType = self._relationshipTypes[idx]
+        except IndexError:
+            # Refresh graph relations.
+            rels = self.relationshipTypes()
+            # Unpack data.
+            self._relationshipTypes = [None] * len(rels)
+            for i, r in enumerate(rels):
+                self._relationshipTypes[i] = r[0]
+
+            relationshipType = self._relationshipTypes[idx]
+        return relationshipType
+
+    def get_property(self, idx):
+        try:
+            propertie = self._properties[idx]
+        except IndexError:
+            # Refresh properties.
+            props = self.propertyKeys()
+            # Unpack data.
+            self._properties = [None] * len(props)
+            for i, p in enumerate(props):
+                self._properties[i] = p[0]
+
+            propertie = self._properties[idx]
+        return propertie
+
     def add_node(self, node):
         """
         Adds a node to the graph.
@@ -67,7 +113,7 @@ class Graph(object):
         statistics = None
         result_set = None
         response = self.redis_con.execute_command("GRAPH.QUERY", self.name, q, "--compact")
-        return QueryResult(response)
+        return QueryResult(self, response)
 
     def execution_plan(self, query):
         """
@@ -90,3 +136,23 @@ class Graph(object):
         query += str(pattern)
 
         return self.query(query)
+
+    # Procedures.
+    def call_procedure(self, procedure, *args, **kwagrs):
+        args = [quote_string(arg) for arg in args]
+        q = 'CALL %s(%s)' % (procedure, ','.join(args))
+
+        y = kwagrs.get('y', None)
+        if y:
+            q += ' YIELD %s' % ','.join(y)
+
+        return self.query(q)
+
+    def labels(self):
+        return self.call_procedure("db.labels").result_set
+
+    def relationshipTypes(self):
+        return self.call_procedure("db.relationshipTypes").result_set
+
+    def propertyKeys(self):
+        return self.call_procedure("db.propertyKeys").result_set

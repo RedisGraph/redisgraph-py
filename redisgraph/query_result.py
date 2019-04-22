@@ -25,15 +25,15 @@ class QueryResult(object):
     RELATIONSHIPS_CREATED = 'Relationships created'
     INTERNAL_EXECUTION_TIME = 'internal execution time'
 
-    def __init__(self, response):
+    def __init__(self, graph, response):
+        self.graph = graph
         if len(response) is 1:
             self.parse_statistics(response[0])
         else:
             self.parse_results(response)
-            self.parse_statistics(response[3])
+            self.parse_statistics(response[2])
 
     def parse_results(self, raw_result_set):
-        self.string_mapping = self.parse_string_mapping(raw_result_set)
         self.header = self.parse_header(raw_result_set)
         self.result_set = self.parse_records(raw_result_set)
 
@@ -46,20 +46,14 @@ class QueryResult(object):
             if v is not None:
                 self.statistics[s] = v
 
-    def parse_string_mapping(self, raw_result_set):
-        # An array of strings, which are referred to
-        # by other parts of the result-set.
-        string_mapping = raw_result_set[0]
-        return string_mapping
-
     def parse_header(self, raw_result_set):
         # An array of column name/column type pairs.
-        header = raw_result_set[1]
+        header = raw_result_set[0]
         return header
 
     def parse_records(self, raw_result_set):
         records = []
-        result_set = raw_result_set[2]
+        result_set = raw_result_set[1]
         for row in result_set:
             record = []
             for idx, cell in enumerate(row):
@@ -79,7 +73,7 @@ class QueryResult(object):
         # [[name, value, value type] X N]
         properties = {}
         for prop in props:
-            prop_name =  self.string_mapping[prop[0]]
+            prop_name =  self.graph.get_property(prop[0])
             prop_value = self.parse_scalar(prop[1:])
             properties[prop_name] = prop_value
 
@@ -93,7 +87,7 @@ class QueryResult(object):
         node_id = int(cell[0])
         label = None
         if len(cell[1]) != 0:
-            label = self.string_mapping[cell[1][0]]
+            label = self.graph.get_label(cell[1][0])
         properties = self.parse_entity_properties(cell[2])
         return Node(node_id=node_id, label=label, properties=properties)
 
@@ -105,7 +99,7 @@ class QueryResult(object):
         # [[name, value, value type] X N]
 
         edge_id = float(cell[0])
-        relation = self.string_mapping[cell[1]]
+        relation = self.graph.get_relation(cell[1])
         src_node_id = float(cell[2])
         dest_node_id = float(cell[3])
         properties = self.parse_entity_properties(cell[4])
