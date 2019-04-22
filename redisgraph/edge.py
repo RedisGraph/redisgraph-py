@@ -41,3 +41,29 @@ class Edge(object):
         res += '(' + self.dest_node.alias + ')'
 
         return res
+
+    def __eq__(self, rhs):
+        # Quick positive check, if both IDs are set.
+        if self.id is not None and rhs.id is not None and self.id == rhs.id:
+            return True
+
+        # Source and destination nodes should match.
+        if self.src_node != rhs.src_node:
+            return False
+            
+        if self.dest_node != rhs.dest_node:
+            return False
+
+        # Relation should match.
+        if self.relation != rhs.relation:
+            return False
+
+        # Quick check for number of properties.
+        if len(self.properties) != len(rhs.properties):
+            return False
+
+        # Compare properties.
+        if self.properties != rhs.properties:
+            return False
+
+        return True
