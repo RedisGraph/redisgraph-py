@@ -27,14 +27,22 @@ class QueryResult(object):
 
     def __init__(self, graph, response):
         self.graph = graph
+        self.header = []
+        self.result_set = []
+
         if len(response) is 1:
             self.parse_statistics(response[0])
         else:
             self.parse_results(response)
-            self.parse_statistics(response[2])
+            self.parse_statistics(response[-1]) # Last element.
 
     def parse_results(self, raw_result_set):
         self.header = self.parse_header(raw_result_set)
+        
+        # Empty header.
+        if len(self.header) == 0:
+            return
+
         self.result_set = self.parse_records(raw_result_set)
 
     def parse_statistics(self, raw_statistics):
@@ -70,7 +78,7 @@ class QueryResult(object):
         return records
 
     def parse_entity_properties(self, props):
-        # [[name, value, value type] X N]
+        # [[name, value type, value] X N]
         properties = {}
         for prop in props:
             prop_name =  self.graph.get_property(prop[0])
@@ -82,7 +90,7 @@ class QueryResult(object):
     def parse_node(self, cell):
         # Node ID (integer),
         # [label string offset (integer)],
-        # [[name, value, value type] X N]
+        # [[name, value type, value] X N]
 
         node_id = int(cell[0])
         label = None

@@ -81,13 +81,14 @@ class Graph(object):
         """
         Create entire graph.
         """
+        if len(self.nodes) == 0 and len(self.edges) == 0:
+            return None
 
         query = 'CREATE '
         for _, node in self.nodes.items():
             query += str(node) + ','
 
-        for edge in self.edges:
-            query += str(edge) + ','
+        query += ','.join([str(edge) for edge in self.edges])
 
         # Discard leading comma.
         if query[-1] is ',':
@@ -99,12 +100,9 @@ class Graph(object):
         """
         Commit the graph and reset the edges and nodes to zero length
         """
-        try:
-            self.commit()
-            self.nodes = {}
-            self.edges = []
-        except:
-            print("Error flushing graph")
+        self.commit()
+        self.nodes = {}
+        self.edges = []
 
     def query(self, q):
         """
