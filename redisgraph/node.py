@@ -4,14 +4,14 @@ class Node(object):
     """
     A node within the garph.
     """
-    def __init__(self, node_id=None, alias=None, label=None, properties=None):
+    def __init__(self, node_id=None, alias=None, label=None, properties={}):
         """
         Create a new node
         """
         self.id = node_id
         self.alias = alias
         self.label = label
-        self.properties = {} or properties
+        self.properties = properties
 
     def toString(self):
         res = ""
@@ -37,7 +37,7 @@ class Node(object):
     def __eq__(self, rhs):
         # Quick positive check, if both IDs are set.
         if self.id is not None and rhs.id is not None and self.id == rhs.id:
-            return True            
+            return True
 
         # Label should match.
         if self.label != rhs.label:

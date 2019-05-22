@@ -13,10 +13,9 @@ class Graph(object):
         self.redis_con = redis_con
         self.nodes = {}
         self.edges = []
-
         self._labels = []            # List of node labels.
-        self._relationshipTypes = [] # List of relation types.
         self._properties = []        # List of properties.
+        self._relationshipTypes = [] # List of relation types.
 
     def get_label(self, idx):
         try:
