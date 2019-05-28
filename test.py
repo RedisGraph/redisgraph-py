@@ -5,7 +5,7 @@ from redisgraph import *
 
 class TestStringMethods(unittest.TestCase):
     def setUp(self):
-        self.r = redis.Redis(host='localhost', port=6379)
+        self.r = redis.Redis(host='localhost', port=6379, decode_responses=True)
 
     def test_graph_creation(self):
         redis_graph = Graph('social', self.r)
