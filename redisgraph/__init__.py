@@ -1,1 +1,3 @@
-from .client import Node, Edge, Graph
+from node import Node
+from edge import Edge
+from graph import Graph
