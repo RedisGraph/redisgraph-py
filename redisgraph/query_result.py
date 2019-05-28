@@ -1,5 +1,5 @@
-from node import Node
-from edge import Edge
+from .node import Node
+from .edge import Edge
 from prettytable import PrettyTable
 
 class ResultSetColumnTypes(object):
@@ -72,7 +72,7 @@ class QueryResult(object):
                 elif self.header[idx][0] == ResultSetColumnTypes.COLUMN_RELATION:
                     record.append(self.parse_edge(cell))
                 else:
-                    print "Unknown column type.\n"
+                    print("Unknown column type.\n")
             records.append(record)
 
         return records
@@ -132,13 +132,13 @@ class QueryResult(object):
             elif value == "false":
                 scalar = False
             else:
-                print "Unknown boolean type\n"
+                print("Unknown boolean type\n")
 
         elif scalar_type == ResultSetScalarTypes.PROPERTY_DOUBLE:
             scalar = float(value)
 
         elif scalar_type == ResultSetScalarTypes.PROPERTY_UNKNOWN:
-            print "Unknown scalar type\n"
+            print("Unknown scalar type\n")
 
         return scalar
 
@@ -170,7 +170,7 @@ class QueryResult(object):
             print(str(tbl) + '\n')
 
         for stat in self.statistics:
-            print "%s %s" %(stat, self.statistics[stat])
+            print("%s %s" %(stat, self.statistics[stat]))
 
     def is_empty(self):
         return len(self.result_set) == 0

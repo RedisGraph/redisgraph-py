@@ -1,5 +1,5 @@
-from util import *
-from query_result import QueryResult
+from .util import *
+from .query_result import QueryResult
 class Graph(object):
     """
     Graph, collection of nodes and edges.
