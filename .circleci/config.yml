@@ -34,13 +34,13 @@ jobs:
           paths:
             - ./venv
           key: v1-dependencies-{{ checksum "requirements.txt" }}
-        
-  #    - run:
-  #        name: run tests
-  #        command: |
-  #          . venv/bin/activate
-  #          python manage.py test
 
+      - run:
+          name: run tests
+          command: |
+            . venv/bin/activate
+            python test.py 
+        
    #   - store_artifacts:
    #       path: test-reports
    #       destination: test-reports
