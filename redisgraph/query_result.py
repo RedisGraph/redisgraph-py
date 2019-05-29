@@ -111,7 +111,7 @@ class QueryResult(object):
         src_node_id = float(cell[2])
         dest_node_id = float(cell[3])
         properties = self.parse_entity_properties(cell[4])
-        return Edge(src_node_id, relation, dest_node_id, properties=properties)
+        return Edge(src_node_id, relation, dest_node_id, edge_id=edge_id, properties=properties)
 
     def parse_scalar(self, cell):
         scalar_type = int(cell[0])
