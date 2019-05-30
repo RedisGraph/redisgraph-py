@@ -116,6 +116,7 @@ class QueryResult(object):
     def parse_scalar(self, cell):
         scalar_type = int(cell[0])
         value = cell[1]
+        scalar = None
 
         if scalar_type == ResultSetScalarTypes.PROPERTY_NULL:
             scalar = None
@@ -127,6 +128,7 @@ class QueryResult(object):
             scalar = int(value)
 
         elif scalar_type == ResultSetScalarTypes.PROPERTY_BOOLEAN:
+            value = value.decode() if isinstance(value, bytes) else value
             if value == "true":
                 scalar = True
             elif value == "false":
