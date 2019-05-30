@@ -128,9 +128,10 @@ class QueryResult(object):
             scalar = int(value)
 
         elif scalar_type == ResultSetScalarTypes.PROPERTY_BOOLEAN:
-            if value == b"true":
+            value = value.decode() if isinstance(value, bytes) else value
+            if value == "true":
                 scalar = True
-            elif value == b"false":
+            elif value == "false":
                 scalar = False
             else:
                 print("Unknown boolean type\n")
