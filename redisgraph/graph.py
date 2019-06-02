@@ -112,11 +112,28 @@ class Graph(object):
         response = self.redis_con.execute_command("GRAPH.QUERY", self.name, q, "--compact")
         return QueryResult(self, response)
 
+    def _execution_plan_to_string(self, plan, plan_str, ident=0):
+        plan_str += ("\t" * ident) + plan[0] + "\n"
+        for i in range (1, len(plan)):
+            plan_str = self._execution_plan_to_string(plan[i], plan_str, ident+1)
+        return plan_str
+
     def execution_plan(self, query):
         """
         Get the execution plan for given query.
+        GRAPH.EXPLAIN returns a nested set of arrays
+        the first element of each array is a string representing
+        the current operation, followed by 0 or more sub-arrays
+        one for each child operation.
         """
-        return self.redis_con.execute_command("GRAPH.EXPLAIN", self.name, query)
+        plan = self.redis_con.execute_command("GRAPH.EXPLAIN", self.name, query)
+        plan_str = ""
+        # TODO: Consider switching to a tree structure
+        # https://treelib.readthedocs.io/en/latest/
+        # make sure we're able to search for a specific operation
+        # within the tree.
+        plan_str = self._execution_plan_to_string(plan, plan_str)
+        return plan_str
 
     def delete(self):
         """
