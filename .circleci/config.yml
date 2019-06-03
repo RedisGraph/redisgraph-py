@@ -29,6 +29,7 @@ jobs:
             python -m venv venv
             . venv/bin/activate
             pip install -r requirements.txt
+            pip install codecov
 
       - save_cache:
           paths:
@@ -39,7 +40,8 @@ jobs:
           name: run tests
           command: |
             . venv/bin/activate
-            python test.py 
+            coverage run test/test.py
+            codecov 
         
    #   - store_artifacts:
    #       path: test-reports
