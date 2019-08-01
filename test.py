@@ -33,6 +33,10 @@ class TestStringMethods(unittest.TestCase):
         self.assertEqual(visit.properties, edge.properties)
         self.assertEqual(country, japan)
 
+        query = """RETURN [1, 2.3, "4", true, false, null]"""
+        result = redis_graph.query(query)
+        self.assertEqual([1, 2.3, "4", True, False, None], result.result_set[0][0])
+
 		# All done, remove graph.
         redis_graph.delete()
 

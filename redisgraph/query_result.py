@@ -9,12 +9,15 @@ class ResultSetColumnTypes(object):
     COLUMN_RELATION = 3
 
 class ResultSetScalarTypes(object):
-    PROPERTY_UNKNOWN = 0
-    PROPERTY_NULL = 1
-    PROPERTY_STRING = 2
-    PROPERTY_INTEGER = 3
-    PROPERTY_BOOLEAN = 4
-    PROPERTY_DOUBLE = 5
+    VALUE_UNKNOWN = 0
+    VALUE_NULL = 1
+    VALUE_STRING = 2
+    VALUE_INTEGER = 3
+    VALUE_BOOLEAN = 4
+    VALUE_DOUBLE = 5
+    VALUE_ARRAY = 6
+    VALUE_EDGE = 7
+    VALUE_NODE = 8
 
 class QueryResult(object):
     LABELS_ADDED = 'Labels added'
@@ -118,16 +121,16 @@ class QueryResult(object):
         value = cell[1]
         scalar = None
 
-        if scalar_type == ResultSetScalarTypes.PROPERTY_NULL:
+        if scalar_type == ResultSetScalarTypes.VALUE_NULL:
             scalar = None
 
-        elif scalar_type == ResultSetScalarTypes.PROPERTY_STRING:
+        elif scalar_type == ResultSetScalarTypes.VALUE_STRING:
             scalar = str(value)
         
-        elif scalar_type == ResultSetScalarTypes.PROPERTY_INTEGER:
+        elif scalar_type == ResultSetScalarTypes.VALUE_INTEGER:
             scalar = int(value)
 
-        elif scalar_type == ResultSetScalarTypes.PROPERTY_BOOLEAN:
+        elif scalar_type == ResultSetScalarTypes.VALUE_BOOLEAN:
             value = value.decode() if isinstance(value, bytes) else value
             if value == "true":
                 scalar = True
@@ -136,10 +139,15 @@ class QueryResult(object):
             else:
                 print("Unknown boolean type\n")
 
-        elif scalar_type == ResultSetScalarTypes.PROPERTY_DOUBLE:
+        elif scalar_type == ResultSetScalarTypes.VALUE_DOUBLE:
             scalar = float(value)
 
-        elif scalar_type == ResultSetScalarTypes.PROPERTY_UNKNOWN:
+        elif scalar_type == ResultSetScalarTypes.VALUE_ARRAY:
+            scalar = []
+            for raw_value in value:
+                scalar.append(self.parse_scalar(raw_value))
+
+        elif scalar_type == ResultSetScalarTypes.VALUE_UNKNOWN:
             print("Unknown scalar type\n")
 
         return scalar
