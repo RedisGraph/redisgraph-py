@@ -147,6 +147,12 @@ class QueryResult(object):
             for raw_value in value:
                 scalar.append(self.parse_scalar(raw_value))
 
+        elif scalar_type == ResultSetScalarTypes.VALUE_NODE:
+            scalar = self.parse_node(value)
+
+        elif scalar_type == ResultSetScalarTypes.VALUE_EDGE:
+            scalar = self.parse_edge(value)
+
         elif scalar_type == ResultSetScalarTypes.VALUE_UNKNOWN:
             print("Unknown scalar type\n")
 
