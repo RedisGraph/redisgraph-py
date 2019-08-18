@@ -40,5 +40,30 @@ class TestStringMethods(unittest.TestCase):
 		# All done, remove graph.
         redis_graph.delete()
 
+    def test_array_functions(self):
+        redis_graph = Graph('social', self.r)
+
+        query = """CREATE (p:person{name:'a',age:32, array:[0,1,2]})"""
+        redis_graph.query(query)
+
+        query = """CREATE (p:person{name:'b',age:30, array:[3,4,5]})"""
+        redis_graph.query(query)
+
+        query = """WITH [0,1,2] as x return x"""
+        result = redis_graph.query(query)
+        self.assertEqual([0, 1, 2], result.result_set[0][0])
+
+        query = """MATCH(n) return collect(n) as x"""
+        result = redis_graph.query(query)
+
+        a = Node(label='person', properties={'name': 'a', 'age': 32, 'array': [0, 1, 2]})
+        b = Node(label='person', properties={'name': 'b', 'age': 30, 'array': [3, 4, 5]})
+
+        self.assertEqual([a, b], result.result_set[0][0])
+
+
+        # All done, remove graph.
+        redis_graph.delete()
+
 if __name__ == '__main__':
 	unittest.main()
