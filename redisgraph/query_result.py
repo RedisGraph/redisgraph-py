@@ -21,7 +21,6 @@ class ResultSetScalarTypes(object):
     VALUE_EDGE = 7
     VALUE_NODE = 8
 
-
 class QueryResult(object):
     LABELS_ADDED = 'Labels added'
     NODES_CREATED = 'Nodes created'
