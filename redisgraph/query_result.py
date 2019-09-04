@@ -147,9 +147,10 @@ class QueryResult(object):
             scalar = float(value)
 
         elif scalar_type == ResultSetScalarTypes.VALUE_ARRAY:
-            scalar = value
-            for i in range(len(value)):
-                scalar[i] = self.parse_scalar(value[i])
+            # array variable is introduced only for readability
+            scalar = array = value
+            for i in range(len(array)):
+                scalar[i] = self.parse_scalar(array[i])
 
         elif scalar_type == ResultSetScalarTypes.VALUE_NODE:
             scalar = self.parse_node(value)
