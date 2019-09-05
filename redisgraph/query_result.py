@@ -2,19 +2,25 @@ from .node import Node
 from .edge import Edge
 from prettytable import PrettyTable
 
+
 class ResultSetColumnTypes(object):
     COLUMN_UNKNOWN = 0
     COLUMN_SCALAR = 1
     COLUMN_NODE = 2
     COLUMN_RELATION = 3
 
+
 class ResultSetScalarTypes(object):
-    PROPERTY_UNKNOWN = 0
-    PROPERTY_NULL = 1
-    PROPERTY_STRING = 2
-    PROPERTY_INTEGER = 3
-    PROPERTY_BOOLEAN = 4
-    PROPERTY_DOUBLE = 5
+    VALUE_UNKNOWN = 0
+    VALUE_NULL = 1
+    VALUE_STRING = 2
+    VALUE_INTEGER = 3
+    VALUE_BOOLEAN = 4
+    VALUE_DOUBLE = 5
+    VALUE_ARRAY = 6
+    VALUE_EDGE = 7
+    VALUE_NODE = 8
+
 
 class QueryResult(object):
     LABELS_ADDED = 'Labels added'
@@ -34,11 +40,11 @@ class QueryResult(object):
             self.parse_statistics(response[0])
         else:
             self.parse_results(response)
-            self.parse_statistics(response[-1]) # Last element.
+            self.parse_statistics(response[-1])  # Last element.
 
     def parse_results(self, raw_result_set):
         self.header = self.parse_header(raw_result_set)
-        
+
         # Empty header.
         if len(self.header) == 0:
             return
@@ -48,7 +54,8 @@ class QueryResult(object):
     def parse_statistics(self, raw_statistics):
         self.statistics = {}
 
-        stats = [self.LABELS_ADDED, self.NODES_CREATED, self.PROPERTIES_SET, self.RELATIONSHIPS_CREATED, self.NODES_DELETED, self.RELATIONSHIPS_DELETED, self.INTERNAL_EXECUTION_TIME]
+        stats = [self.LABELS_ADDED, self.NODES_CREATED, self.PROPERTIES_SET, self.RELATIONSHIPS_CREATED,
+                 self.NODES_DELETED, self.RELATIONSHIPS_DELETED, self.INTERNAL_EXECUTION_TIME]
         for s in stats:
             v = self._get_value(s, raw_statistics)
             if v is not None:
@@ -81,7 +88,7 @@ class QueryResult(object):
         # [[name, value type, value] X N]
         properties = {}
         for prop in props:
-            prop_name =  self.graph.get_property(prop[0])
+            prop_name = self.graph.get_property(prop[0])
             prop_value = self.parse_scalar(prop[1:])
             properties[prop_name] = prop_value
 
@@ -118,16 +125,16 @@ class QueryResult(object):
         value = cell[1]
         scalar = None
 
-        if scalar_type == ResultSetScalarTypes.PROPERTY_NULL:
+        if scalar_type == ResultSetScalarTypes.VALUE_NULL:
             scalar = None
 
-        elif scalar_type == ResultSetScalarTypes.PROPERTY_STRING:
+        elif scalar_type == ResultSetScalarTypes.VALUE_STRING:
             scalar = str(value)
-        
-        elif scalar_type == ResultSetScalarTypes.PROPERTY_INTEGER:
+
+        elif scalar_type == ResultSetScalarTypes.VALUE_INTEGER:
             scalar = int(value)
 
-        elif scalar_type == ResultSetScalarTypes.PROPERTY_BOOLEAN:
+        elif scalar_type == ResultSetScalarTypes.VALUE_BOOLEAN:
             value = value.decode() if isinstance(value, bytes) else value
             if value == "true":
                 scalar = True
@@ -136,10 +143,22 @@ class QueryResult(object):
             else:
                 print("Unknown boolean type\n")
 
-        elif scalar_type == ResultSetScalarTypes.PROPERTY_DOUBLE:
+        elif scalar_type == ResultSetScalarTypes.VALUE_DOUBLE:
             scalar = float(value)
 
-        elif scalar_type == ResultSetScalarTypes.PROPERTY_UNKNOWN:
+        elif scalar_type == ResultSetScalarTypes.VALUE_ARRAY:
+            # array variable is introduced only for readability
+            scalar = array = value
+            for i in range(len(array)):
+                scalar[i] = self.parse_scalar(array[i])
+
+        elif scalar_type == ResultSetScalarTypes.VALUE_NODE:
+            scalar = self.parse_node(value)
+
+        elif scalar_type == ResultSetScalarTypes.VALUE_EDGE:
+            scalar = self.parse_edge(value)
+
+        elif scalar_type == ResultSetScalarTypes.VALUE_UNKNOWN:
             print("Unknown scalar type\n")
 
         return scalar
@@ -150,6 +169,7 @@ class QueryResult(object):
        2. The row after that will contain the data returned, or 'No Data returned' if there is none.
        3. Prints the statistics of the query.
     """
+
     def pretty_print(self):
         if not self.is_empty():
             header = [col[1] for col in self.header]
@@ -172,7 +192,7 @@ class QueryResult(object):
             print(str(tbl) + '\n')
 
         for stat in self.statistics:
-            print("%s %s" %(stat, self.statistics[stat]))
+            print("%s %s" % (stat, self.statistics[stat]))
 
     def is_empty(self):
         return len(self.result_set) == 0
@@ -191,7 +211,7 @@ class QueryResult(object):
         return self.statistics[stat] if stat in self.statistics else 0
 
     @property
-    def labels_added(self):        
+    def labels_added(self):
         return self._get_stat(self.LABELS_ADDED)
 
     @property
@@ -217,4 +237,3 @@ class QueryResult(object):
     @property
     def run_time_ms(self):
         return self._get_stat(self.INTERNAL_EXECUTION_TIME)
-
