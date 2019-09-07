@@ -13,7 +13,10 @@ def quote_string(v):
     quote_string wraps given v with quotes incase
     v is a string.
     """
-    if not isinstance(v, str):
+
+    if isinstance(v, bytes):
+        v = v.decode()
+    elif not isinstance(v, str):
         return v
 
     if v[0] != '"':
