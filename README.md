@@ -38,8 +38,8 @@ result = redis_graph.query(query)
 # Print resultset
 result.pretty_print()
 
-# Iterate through resultset, skip header row at position 0
-for record in result.result_set[1:]:
+# Iterate through resultset
+for record in result.result_set:
 	person_name = record[0]
 	person_age = record[1]
 	visit_purpose = record[2]
