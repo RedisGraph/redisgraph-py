@@ -1,6 +1,7 @@
 from .node import Node
 from .edge import Edge
 from prettytable import PrettyTable
+from redis import ResponseError
 
 
 class ResultSetColumnTypes(object):
@@ -21,7 +22,6 @@ class ResultSetScalarTypes(object):
     VALUE_EDGE = 7
     VALUE_NODE = 8
 
-
 class QueryResult(object):
     LABELS_ADDED = 'Labels added'
     NODES_CREATED = 'Nodes created'
@@ -35,6 +35,10 @@ class QueryResult(object):
         self.graph = graph
         self.header = []
         self.result_set = []
+
+        # If we encountered a run-time error, the last response element will be an exception.
+        if isinstance(response[-1], ResponseError):
+            raise response[-1]
 
         if len(response) is 1:
             self.parse_statistics(response[0])
