@@ -15,6 +15,8 @@ def quote_string(v):
     """
     if not isinstance(v, str):
         return v
+    if len(v) == 0:
+        return '""'
 
     if v[0] != '"':
         v = '"' + v
