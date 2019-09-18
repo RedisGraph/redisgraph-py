@@ -51,6 +51,14 @@ redis_graph.delete()
 ```
 
 # Installing
+
+### Install official release
+
 ```
 pip install redisgraph
+```
+### Install latest release (Aligned with RedisGraph master)
+
+```
+pip install git+https://github.com/RedisGraph/redisgraph-py.git@master
 ```
