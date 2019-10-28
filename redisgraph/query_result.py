@@ -129,7 +129,7 @@ class QueryResult(object):
     def parse_path(self, cell):
         nodes = self.parse_scalar(cell[0])
         edges = self.parse_scalar(cell[1])
-        return Path.new_path(nodes, edges)
+        return Path(nodes, edges)
 
     def parse_scalar(self, cell):
         scalar_type = int(cell[0])

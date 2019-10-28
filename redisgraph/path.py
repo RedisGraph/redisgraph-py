@@ -13,10 +13,6 @@ class Path(object):
     def new_empty_path(cls):
         return cls([], [])
 
-    @classmethod
-    def new_path(cls, nodes, edges):
-        return cls(nodes, edges)
-
     def nodes(self):
         return self.nodes
 

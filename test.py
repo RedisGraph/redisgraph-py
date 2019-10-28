@@ -81,7 +81,7 @@ class TestStringMethods(unittest.TestCase):
         redis_graph.add_edge(edge01)
         redis_graph.add_edge(edge12)
 
-        redis_graph.commit()
+        redis_graph.flush()
 
         path01 = Path.new_empty_path().add_node(node0).add_edge(edge01).add_node(node1)
         path12 = Path.new_empty_path().add_node(node1).add_edge(edge12).add_node(node2)
