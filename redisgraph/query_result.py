@@ -126,11 +126,10 @@ class QueryResult(object):
         properties = self.parse_entity_properties(cell[4])
         return Edge(src_node_id, relation, dest_node_id, edge_id=edge_id, properties=properties)
 
-
     def parse_path(self, cell):
         nodes = self.parse_scalar(cell[0])
-        relationships = self.parse_scalar(cell[1])
-        return Path(nodes, relationships)
+        edges = self.parse_scalar(cell[1])
+        return Path.new_path(nodes, edges)
 
     def parse_scalar(self, cell):
         scalar_type = int(cell[0])

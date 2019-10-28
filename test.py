@@ -69,20 +69,30 @@ class TestStringMethods(unittest.TestCase):
     def test_path(self):
         redis_graph = Graph('social', self.r)
 
-        query = """CREATE (a:L1)-[:R1 {value:1}]->(b:L1)-[:R1 {value:2}]->(c:L1)"""
-        redis_graph.query(query)
-        query = "MATCH p=(:L1)-[:R1]->(:L1) RETURN p"
         node0 = Node(node_id=0, label="L1")
-        edge01 = Edge(0, "R1", 1, edge_id=0, properties={'value': 1})
         node1 = Node(node_id=1, label="L1")
-        edge12 = Edge(1, "R1", 2, edge_id=1, properties={'value': 2})
         node2 = Node(node_id=2, label="L1")
+        edge01 = Edge(node0, "R1", node1, edge_id=0, properties={'value': 1})
+        edge12 = Edge(node1, "R1", node2, edge_id=1, properties={'value': 2})
 
-        path01 = Path([node0, node1], [edge01])
-        path12 = Path([node1, node2], [edge12])
+        redis_graph.add_node(node0)
+        redis_graph.add_node(node1)
+        redis_graph.add_node(node2)
+        redis_graph.add_edge(edge01)
+        redis_graph.add_edge(edge12)
+
+        redis_graph.commit()
+
+        path01 = Path.new_empty_path().add_node(node0).add_edge(edge01).add_node(node1)
+        path12 = Path.new_empty_path().add_node(node1).add_edge(edge12).add_node(node2)
         expected_results = [[path01], [path12]]
+
+        query = "MATCH p=(:L1)-[:R1]->(:L1) RETURN p"
         result = redis_graph.query(query)
         self.assertEqual(expected_results, result.result_set)
+
+        # All done, remove graph.
+        redis_graph.delete()
 
 
 if __name__ == '__main__':
