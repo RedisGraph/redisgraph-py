@@ -65,5 +65,25 @@ class TestStringMethods(unittest.TestCase):
         # All done, remove graph.
         redis_graph.delete()
 
+
+    def test_path(self):
+        redis_graph = Graph('social', self.r)
+
+        query = """CREATE (a:L1)-[:R1 {value:1}]->(b:L1)-[:R1 {value:2}]->(c:L1)"""
+        redis_graph.query(query)
+        query = "MATCH p=(:L1)-[:R1]->(:L1) RETURN p"
+        node0 = Node(node_id=0, label="L1")
+        edge01 = Edge(0, "R1", 1, edge_id=0, properties={'value': 1})
+        node1 = Node(node_id=1, label="L1")
+        edge12 = Edge(1, "R1", 2, edge_id=1, properties={'value': 2})
+        node2 = Node(node_id=2, label="L1")
+
+        path01 = Path([node0, node1], [edge01])
+        path12 = Path([node1, node2], [edge12])
+        expected_results = [[path01], [path12]]
+        result = redis_graph.query(query)
+        self.assertEqual(expected_results, result.result_set)
+
+
 if __name__ == '__main__':
 	unittest.main()
