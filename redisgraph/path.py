@@ -38,13 +38,13 @@ class Path(object):
         return len(self.nodes)
 
     def add_node(self, node):
-        assert(isinstance(node, self.append_type))
+        assert(type(node) == self.append_type)
         self.nodes.append(node)
         self.append_type = Edge
         return self
 
     def add_edge(self, edge):
-        assert(isinstance(edge, self.append_type))
+        assert(type(edge) == self.append_type)
         self.edges.append(edge)
         self.append_type = Node
         return self
