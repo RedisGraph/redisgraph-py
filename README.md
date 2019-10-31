@@ -16,7 +16,7 @@ RedisGraph python client
 
 ```python
 import redis
-from redisgraph import Node, Edge, Graph
+from redisgraph import Node, Edge, Graph, Path
 
 r = redis.Redis(host='localhost', port=6379)
 
@@ -47,6 +47,16 @@ for record in result.result_set:
 	person_age = record[1]
 	visit_purpose = record[2]
 	country_name = record[3]
+	
+query = """MATCH p = (:person)-[:visited {purpose:"pleasure"}]->(:country) RETURN p"""
+
+result = redis_graph.query(query)
+
+# Iterate through resultset
+for record in result.result_set:
+    path = record[0]
+    # See path.py for more path API.
+    print(path.edge_count(), path.nodes_count())
 
 
 # All done, remove graph.
