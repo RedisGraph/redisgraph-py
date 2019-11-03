@@ -55,8 +55,7 @@ result = redis_graph.query(query)
 # Iterate through resultset
 for record in result.result_set:
     path = record[0]
-    # See path.py for more path API.
-    print(path.edge_count(), path.nodes_count())
+    print(path)
 
 
 # All done, remove graph.
