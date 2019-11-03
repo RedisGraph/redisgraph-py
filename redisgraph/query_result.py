@@ -1,5 +1,6 @@
 from .node import Node
 from .edge import Edge
+from .path import Path
 from prettytable import PrettyTable
 from redis import ResponseError
 
@@ -21,6 +22,7 @@ class ResultSetScalarTypes(object):
     VALUE_ARRAY = 6
     VALUE_EDGE = 7
     VALUE_NODE = 8
+    VALUE_PATH = 9
 
 class QueryResult(object):
     LABELS_ADDED = 'Labels added'
@@ -124,6 +126,11 @@ class QueryResult(object):
         properties = self.parse_entity_properties(cell[4])
         return Edge(src_node_id, relation, dest_node_id, edge_id=edge_id, properties=properties)
 
+    def parse_path(self, cell):
+        nodes = self.parse_scalar(cell[0])
+        edges = self.parse_scalar(cell[1])
+        return Path(nodes, edges)
+
     def parse_scalar(self, cell):
         scalar_type = int(cell[0])
         value = cell[1]
@@ -161,6 +168,9 @@ class QueryResult(object):
 
         elif scalar_type == ResultSetScalarTypes.VALUE_EDGE:
             scalar = self.parse_edge(value)
+
+        elif scalar_type == ResultSetScalarTypes.VALUE_PATH:
+            scalar = self.parse_path(value)
 
         elif scalar_type == ResultSetScalarTypes.VALUE_UNKNOWN:
             print("Unknown scalar type\n")
