@@ -94,6 +94,19 @@ class TestStringMethods(unittest.TestCase):
         # All done, remove graph.
         redis_graph.delete()
 
+    def test_param(self):
+        redis_graph = Graph('params', self.r)
+
+        params = [1, 2.3, "str", True, False, None, [0, 1, 2]]
+
+        for param in params:
+            query = "RETURN $param"
+            result = redis_graph.query(query, {'param': param})
+            expected_results = [[param]]
+            self.assertEqual(expected_results, result.result_set)
+
+        # All done, remove graph.
+        redis_graph.delete()
 
 if __name__ == '__main__':
 	unittest.main()
