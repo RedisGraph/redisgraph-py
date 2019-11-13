@@ -98,9 +98,8 @@ class TestStringMethods(unittest.TestCase):
         redis_graph = Graph('params', self.r)
 
         params = [1, 2.3, "str", True, False, None, [0, 1, 2]]
-
+        query = "RETURN $param"
         for param in params:
-            query = "RETURN $param"
             result = redis_graph.query(query, {'param': param})
             expected_results = [[param]]
             self.assertEqual(expected_results, result.result_set)
