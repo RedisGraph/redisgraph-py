@@ -103,12 +103,30 @@ class Graph(object):
         self.nodes = {}
         self.edges = []
 
-    def query(self, q):
+    def build_params_header(self, params):
+        assert type(params) == dict
+        # Header starts with "CYPHER"
+        params_header = "CYPHER "
+        for key, value in params.items():
+            # If value is string add quotation marks.
+            if type(value) == str:
+                value = quote_string(value)
+            # Value is None, replace with "null" string.
+            elif value is None:
+                value = "null"
+            params_header += str(key) + "=" + str(value) + " "
+        return params_header
+
+    def query(self, q, params=None):
         """
         Executes a query against the graph.
         """
+        if params is not None:
+            q = self.build_params_header(params) + q
+
         statistics = None
         result_set = None
+
         response = self.redis_con.execute_command("GRAPH.QUERY", self.name, q, "--compact")
         return QueryResult(self, response)
 

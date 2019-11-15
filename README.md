@@ -41,6 +41,17 @@ result = redis_graph.query(query)
 # Print resultset
 result.pretty_print()
 
+# Use parameters
+params = {'purpose':"pleasure"}
+query = """MATCH (p:person)-[v:visited {purpose:$purpose}]->(c:country)
+		   RETURN p.name, p.age, v.purpose, c.name"""
+
+result = redis_graph.query(query, params)
+
+# Print resultset
+result.pretty_print()
+
+
 # Iterate through resultset
 for record in result.result_set:
 	person_name = record[0]
