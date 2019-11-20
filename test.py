@@ -107,7 +107,7 @@ class TestStringMethods(unittest.TestCase):
         # All done, remove graph.
         redis_graph.delete()
 
-    def test_printing_query_result(self):
+    def test_stringify_query_result(self):
         redis_graph = Graph('printing', self.r)
 
         john = Node(label='person', properties={'name': 'John Doe', 'age': 33, 'gender': 'male', 'status': 'single'})
