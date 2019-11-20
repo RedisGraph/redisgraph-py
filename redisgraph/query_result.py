@@ -119,10 +119,10 @@ class QueryResult(object):
         # dest node ID offset (integer),
         # [[name, value, value type] X N]
 
-        edge_id = float(cell[0])
+        edge_id = int(cell[0])
         relation = self.graph.get_relation(cell[1])
-        src_node_id = float(cell[2])
-        dest_node_id = float(cell[3])
+        src_node_id = int(cell[2])
+        dest_node_id = int(cell[3])
         properties = self.parse_entity_properties(cell[4])
         return Edge(src_node_id, relation, dest_node_id, edge_id=edge_id, properties=properties)
 
