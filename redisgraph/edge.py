@@ -1,3 +1,5 @@
+from redisgraph import Node
+
 from .util import *
 
 class Edge(object):
@@ -26,7 +28,10 @@ class Edge(object):
 
     def __str__(self):
         # Source node.
-        res = '(' + self.src_node.alias + ')'
+        if isinstance(self.src_node, Node):
+            res = '(' + self.src_node.alias + ')'
+        else:
+            res = '()'
 
         # Edge
         res += "-["
@@ -38,7 +43,10 @@ class Edge(object):
         res += ']->'
 
         # Dest node.
-        res += '(' + self.dest_node.alias + ')'
+        if isinstance(self.dest_node, Node):
+            res += '(' + self.dest_node.alias + ')'
+        else:
+            res += '()'
 
         return res
 
