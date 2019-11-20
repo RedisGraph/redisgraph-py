@@ -29,7 +29,7 @@ class Edge(object):
     def __str__(self):
         # Source node.
         if isinstance(self.src_node, Node):
-            res = '(' + self.src_node.alias + ')'
+            res = str(self.src_node)
         else:
             res = '()'
 
@@ -44,7 +44,7 @@ class Edge(object):
 
         # Dest node.
         if isinstance(self.dest_node, Node):
-            res += '(' + self.dest_node.alias + ')'
+            res += str(self.dest_node)
         else:
             res += '()'
 
