@@ -6,6 +6,7 @@
 
 [![Mailing List](https://img.shields.io/badge/Mailing%20List-RedisGraph-blue)](https://groups.google.com/forum/#!forum/redisgraph)
 [![Gitter](https://badges.gitter.im/RedisLabs/RedisGraph.svg)](https://gitter.im/RedisLabs/RedisGraph?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge)
+[![FOSSA Status](https://app.fossa.io/api/projects/git%2Bgithub.com%2FRedisGraph%2Fredisgraph-py.svg?type=shield)](https://app.fossa.io/projects/git%2Bgithub.com%2FRedisGraph%2Fredisgraph-py?ref=badge_shield)
 
 
 # redisgraph-py
@@ -85,3 +86,7 @@ pip install redisgraph
 ```
 pip install git+https://github.com/RedisGraph/redisgraph-py.git@master
 ```
+
+
+## License
+[![FOSSA Status](https://app.fossa.io/api/projects/git%2Bgithub.com%2FRedisGraph%2Fredisgraph-py.svg?type=large)](https://app.fossa.io/projects/git%2Bgithub.com%2FRedisGraph%2Fredisgraph-py?ref=badge_large)
