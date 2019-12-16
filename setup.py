@@ -24,6 +24,5 @@ setup(
     ],
     keywords='Redis Graph Extension',
     author='RedisLabs',
-    author_email='oss@redislabs.com',
-    test_suite="tests"
+    author_email='oss@redislabs.com'
 )
