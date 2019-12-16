@@ -31,6 +31,8 @@ class QueryResult(object):
     RELATIONSHIPS_DELETED = 'Relationships deleted'
     PROPERTIES_SET = 'Properties set'
     RELATIONSHIPS_CREATED = 'Relationships created'
+    INDICES_CREATED = "Indices created"
+    INDICES_DELETED = "Indices deleted"
     INTERNAL_EXECUTION_TIME = 'internal execution time'
 
     def __init__(self, graph, response):
@@ -61,7 +63,8 @@ class QueryResult(object):
         self.statistics = {}
 
         stats = [self.LABELS_ADDED, self.NODES_CREATED, self.PROPERTIES_SET, self.RELATIONSHIPS_CREATED,
-                 self.NODES_DELETED, self.RELATIONSHIPS_DELETED, self.INTERNAL_EXECUTION_TIME]
+                 self.NODES_DELETED, self.RELATIONSHIPS_DELETED, self.INDICES_CREATED, self.INDICES_DELETED,
+                 self.INTERNAL_EXECUTION_TIME]
         for s in stats:
             v = self._get_value(s, raw_statistics)
             if v is not None:
@@ -247,6 +250,14 @@ class QueryResult(object):
     @property
     def relationships_deleted(self):
         return self._get_stat(self.RELATIONSHIPS_DELETED)
+
+    @property
+    def indices_created(self):
+        return self._get_stat(self.INDICES_CREATED)
+
+    @property
+    def indices_deleted(self):
+        return self._get_stat(self.INDICES_DELETED)
 
     @property
     def run_time_ms(self):
