@@ -107,5 +107,24 @@ class TestStringMethods(unittest.TestCase):
         # All done, remove graph.
         redis_graph.delete()
 
+    def test_index_response(self):
+        redis_graph = Graph('social', self.r)
+
+        result_set = redis_graph.query("CREATE INDEX ON :person(age)")
+        self.assertEqual(1, result_set.indices_created)
+
+        result_set = redis_graph.query("CREATE INDEX ON :person(age)")
+        self.assertEqual(0, result_set.indices_created)
+
+        result_set = redis_graph.query("DROP INDEX ON :person(age)")
+        self.assertEqual(1, result_set.indices_deleted)
+
+        try:
+            result_set = redis_graph.query("DROP INDEX ON :person(age)")
+        except redis.exceptions.ResponseError as e:
+            self.assertEqual(e.__str__(), "Unable to drop index on :person(age): no such index.")
+
+        redis_graph.delete()
+
 if __name__ == '__main__':
 	unittest.main()
