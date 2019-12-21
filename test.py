@@ -9,26 +9,26 @@ class TestStringMethods(unittest.TestCase):
 
     def test_graph_creation(self):
         redis_graph = Graph('social', self.r)
-
+        
         john = Node(label='person', properties={'name': 'John Doe', 'age': 33, 'gender': 'male', 'status': 'single'})
         redis_graph.add_node(john)
         japan = Node(label='country', properties={'name': 'Japan'})
-
+        
         redis_graph.add_node(japan)
         edge = Edge(john, 'visited', japan, properties={'purpose': 'pleasure'})
         redis_graph.add_edge(edge)
-
+        
         redis_graph.commit()
-
+        
         query = """MATCH (p:person)-[v:visited {purpose:"pleasure"}]->(c:country)
 				   RETURN p, v, c"""
-
+        
         result = redis_graph.query(query)
-
+        
         person = result.result_set[0][0]
         visit = result.result_set[0][1]
         country = result.result_set[0][2]
-
+        
         self.assertEqual(person, john)
         self.assertEqual(visit.properties, edge.properties)
         self.assertEqual(country, japan)
@@ -37,7 +37,7 @@ class TestStringMethods(unittest.TestCase):
         result = redis_graph.query(query)
         self.assertEqual([1, 2.3, "4", True, False, None], result.result_set[0][0])
 
-        # All done, remove graph.
+		# All done, remove graph.
         redis_graph.delete()
 
     def test_array_functions(self):
@@ -61,8 +61,10 @@ class TestStringMethods(unittest.TestCase):
 
         self.assertEqual([a, b], result.result_set[0][0])
 
+
         # All done, remove graph.
         redis_graph.delete()
+
 
     def test_path(self):
         redis_graph = Graph('social', self.r)
@@ -103,6 +105,25 @@ class TestStringMethods(unittest.TestCase):
             self.assertEqual(expected_results, result.result_set)
 
         # All done, remove graph.
+        redis_graph.delete()
+
+    def test_index_response(self):
+        redis_graph = Graph('social', self.r)
+
+        result_set = redis_graph.query("CREATE INDEX ON :person(age)")
+        self.assertEqual(1, result_set.indices_created)
+
+        result_set = redis_graph.query("CREATE INDEX ON :person(age)")
+        self.assertEqual(0, result_set.indices_created)
+
+        result_set = redis_graph.query("DROP INDEX ON :person(age)")
+        self.assertEqual(1, result_set.indices_deleted)
+
+        try:
+            result_set = redis_graph.query("DROP INDEX ON :person(age)")
+        except redis.exceptions.ResponseError as e:
+            self.assertEqual(e.__str__(), "Unable to drop index on :person(age): no such index.")
+
         redis_graph.delete()
 
     def test_stringify_query_result(self):
