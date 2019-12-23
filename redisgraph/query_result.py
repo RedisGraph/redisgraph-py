@@ -143,7 +143,12 @@ class QueryResult(object):
             scalar = None
 
         elif scalar_type == ResultSetScalarTypes.VALUE_STRING:
-            scalar = str(value)
+            if isinstance(value, bytes):
+                scalar = value.decode()
+            elif not isinstance(value, str):
+                scalar = str(value)
+            else:
+                scalar = value
 
         elif scalar_type == ResultSetScalarTypes.VALUE_INTEGER:
             scalar = int(value)
