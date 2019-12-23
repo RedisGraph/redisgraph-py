@@ -126,5 +126,42 @@ class TestStringMethods(unittest.TestCase):
 
         redis_graph.delete()
 
+    def test_stringify_query_result(self):
+        redis_graph = Graph('stringify', self.r)
+
+        john = Node(alias='a', label='person',
+                    properties={'name': 'John Doe', 'age': 33, 'gender': 'male', 'status': 'single'})
+        redis_graph.add_node(john)
+        japan = Node(alias='b', label='country', properties={'name': 'Japan'})
+
+        redis_graph.add_node(japan)
+        edge = Edge(john, 'visited', japan, properties={'purpose': 'pleasure'})
+        redis_graph.add_edge(edge)
+
+        self.assertEqual(str(john),
+                         """(a:person{name:"John Doe",age:33,gender:"male",status:"single"})""")
+        self.assertEqual(str(edge),
+                         """(a:person{name:"John Doe",age:33,gender:"male",status:"single"})""" +
+                         """-[:visited{purpose:"pleasure"}]->""" +
+                         """(b:country{name:"Japan"})""")
+        self.assertEqual(str(japan), """(b:country{name:"Japan"})""")
+
+        redis_graph.commit()
+
+        query = """MATCH (p:person)-[v:visited {purpose:"pleasure"}]->(c:country)
+                RETURN p, v, c"""
+
+        result = redis_graph.query(query)
+        person = result.result_set[0][0]
+        visit = result.result_set[0][1]
+        country = result.result_set[0][2]
+
+        self.assertEqual(str(person), """(:person{name:"John Doe",age:33,gender:"male",status:"single"})""")
+        self.assertEqual(str(visit), """()-[:visited{purpose:"pleasure"}]->()""")
+        self.assertEqual(str(country), """(:country{name:"Japan"})""")
+
+        redis_graph.delete()
+
+
 if __name__ == '__main__':
-	unittest.main()
+    unittest.main()
