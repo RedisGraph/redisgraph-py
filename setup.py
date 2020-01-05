@@ -5,8 +5,10 @@ def read_all(f):
     with io.open(f, encoding="utf-8") as I:
         return I.read()
 
-requirements = map(str.strip, open("requirements.txt").readlines())    
-    
+
+requirements = list(map(str.strip, open("requirements.txt").readlines()))
+
+
 setup(
     name='redisgraph',
     version='2.1.1',
