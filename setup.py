@@ -15,7 +15,7 @@ setup(
     description='RedisGraph Python Client',
     long_description=read_all("README.md"),
     long_description_content_type='text/markdown',
-    url='https://github.com/redislabs/redisgraph-py',
+    url='https://github.com/RedisGraph/redisgraph-py',
     packages=find_packages(),
     install_requires=requirements,
     classifiers=[
