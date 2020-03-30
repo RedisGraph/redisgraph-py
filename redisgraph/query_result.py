@@ -138,10 +138,6 @@ class QueryResult(object):
         return Edge(src_node_id, relation, dest_node_id, edge_id=edge_id, properties=properties)
 
     def parse_path(self, cell):
-        # Return None if we received a null value.
-        if self.is_null_scalar(cell):
-            return None
-
         nodes = self.parse_scalar(cell[0])
         edges = self.parse_scalar(cell[1])
         return Path(nodes, edges)
