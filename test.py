@@ -162,6 +162,30 @@ class TestStringMethods(unittest.TestCase):
 
         redis_graph.delete()
 
+    def test_optional_match(self):
+        redis_graph = Graph('optional', self.r)
+
+        # Build a graph of form (a)-[R]->(b)
+        node0 = Node(node_id=0, label="L1", properties={'value': 'a'})
+        node1 = Node(node_id=1, label="L1", properties={'value': 'b'})
+
+        edge01 = Edge(node0, "R", node1, edge_id=0)
+
+        redis_graph.add_node(node0)
+        redis_graph.add_node(node1)
+        redis_graph.add_edge(edge01)
+
+        redis_graph.flush()
+
+        # Issue a query that collects all outgoing edges from both nodes (the second has none).
+        query = """MATCH (a) OPTIONAL MATCH (a)-[e]->(b) RETURN a, e, b ORDER BY a.value"""
+        expected_results = [[node0, edge01, node1],
+                            [node1, None, None]]
+
+        result = redis_graph.query(query)
+        self.assertEqual(expected_results, result.result_set)
+
+        redis_graph.delete()
 
 if __name__ == '__main__':
     unittest.main()
