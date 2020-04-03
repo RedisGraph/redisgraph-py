@@ -11,7 +11,7 @@ requirements = list(map(str.strip, open("requirements.txt").readlines()))
 
 setup(
     name='redisgraph',
-    version='2.1.2',
+    version='2.1.3',
     description='RedisGraph Python Client',
     long_description=read_all("README.md"),
     long_description_content_type='text/markdown',
