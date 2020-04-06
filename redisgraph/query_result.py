@@ -8,8 +8,8 @@ from redis import ResponseError
 class ResultSetColumnTypes(object):
     COLUMN_UNKNOWN = 0
     COLUMN_SCALAR = 1
-    COLUMN_NODE = 2
-    COLUMN_RELATION = 3
+    COLUMN_NODE = 2       # Unused as of RedisGraph v2.1.0, retained for backwards compatibility.
+    COLUMN_RELATION = 3   # Unused as of RedisGraph v2.1.0, retained for backwards compatibility.
 
 
 class ResultSetScalarTypes(object):
@@ -104,10 +104,6 @@ class QueryResult(object):
         return properties
 
     def parse_node(self, cell):
-        # Return None if we received a null value.
-        if self.is_null_scalar(cell):
-            return None
-
         # Node ID (integer),
         # [label string offset (integer)],
         # [[name, value type, value] X N]
@@ -120,10 +116,6 @@ class QueryResult(object):
         return Node(node_id=node_id, label=label, properties=properties)
 
     def parse_edge(self, cell):
-        # Return None if we received a null value.
-        if self.is_null_scalar(cell):
-            return None
-
         # Edge ID (integer),
         # reltype string offset (integer),
         # src node ID offset (integer),
@@ -226,9 +218,6 @@ class QueryResult(object):
 
     def is_empty(self):
         return len(self.result_set) == 0
-
-    def is_null_scalar(self, cell):
-        return cell == [ResultSetScalarTypes.VALUE_NULL, None]
 
     @staticmethod
     def _get_value(prop, statistics):
