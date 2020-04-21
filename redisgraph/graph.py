@@ -131,7 +131,7 @@ class Graph(object):
         return QueryResult(self, response)
 
     def _execution_plan_to_string(self, plan):
-        return "\n".join(plan)
+        return b"\n".join(plan)
 
     def execution_plan(self, query):
         """
