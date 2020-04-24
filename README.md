@@ -12,7 +12,7 @@
 RedisGraph python client
 
 
-# Example: Using the Python Client
+## Example: Using the Python Client
 
 ```python
 import redis
@@ -73,7 +73,7 @@ for record in result.result_set:
 redis_graph.delete()
 ```
 
-# Installing
+## Installing
 
 ### Install official release
 
