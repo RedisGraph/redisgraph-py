@@ -33,6 +33,7 @@ class QueryResult(object):
     RELATIONSHIPS_CREATED = 'Relationships created'
     INDICES_CREATED = "Indices created"
     INDICES_DELETED = "Indices deleted"
+    CACHED_EXECUTION = "Cached execution"
     INTERNAL_EXECUTION_TIME = 'internal execution time'
 
     def __init__(self, graph, response):
@@ -64,7 +65,7 @@ class QueryResult(object):
 
         stats = [self.LABELS_ADDED, self.NODES_CREATED, self.PROPERTIES_SET, self.RELATIONSHIPS_CREATED,
                  self.NODES_DELETED, self.RELATIONSHIPS_DELETED, self.INDICES_CREATED, self.INDICES_DELETED,
-                 self.INTERNAL_EXECUTION_TIME]
+                 self.CACHED_EXECUTION, self.INTERNAL_EXECUTION_TIME]
         for s in stats:
             v = self._get_value(s, raw_statistics)
             if v is not None:
@@ -225,7 +226,14 @@ class QueryResult(object):
             if isinstance(stat, bytes):
                 stat = stat.decode()
             if prop in stat:
-                return float(stat.split(': ')[1].split(' ')[0])
+                if(prop == "Cached execution"):
+                    value = stat.split(': ')[1].split(' ')[0]
+                    if value == "true":
+                        return True
+                    elif value == "false":
+                        return False
+                else:
+                    return float(stat.split(': ')[1].split(' ')[0])
 
         return None
 
@@ -263,6 +271,14 @@ class QueryResult(object):
     @property
     def indices_deleted(self):
         return self._get_stat(self.INDICES_DELETED)
+
+    @property
+    def cached_execution(self):
+        value = self._get_stat(self.CACHED_EXECUTION)
+        if value == "true":
+            return True
+        elif value == "false":
+            return False
 
     @property
     def run_time_ms(self):
