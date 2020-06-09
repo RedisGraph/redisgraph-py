@@ -274,11 +274,7 @@ class QueryResult(object):
 
     @property
     def cached_execution(self):
-        value = self._get_stat(self.CACHED_EXECUTION)
-        if value == "true":
-            return True
-        elif value == "false":
-            return False
+        return self._get_stat(self.CACHED_EXECUTION)
 
     @property
     def run_time_ms(self):
