@@ -195,6 +195,7 @@ class TestStringMethods(unittest.TestCase):
         self.assertEqual(uncached_result.result_set, cached_result.result_set)
         self.assertFalse(uncached_result.cached_execution)
         self.assertTrue(cached_result.cached_execution)
+        redis_graph.delete()
 
 if __name__ == '__main__':
     unittest.main()

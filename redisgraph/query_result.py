@@ -226,14 +226,8 @@ class QueryResult(object):
             if isinstance(stat, bytes):
                 stat = stat.decode()
             if prop in stat:
-                if(prop == "Cached execution"):
-                    value = stat.split(': ')[1].split(' ')[0]
-                    if value == "true":
-                        return True
-                    elif value == "false":
-                        return False
-                else:
-                    return float(stat.split(': ')[1].split(' ')[0])
+                return float(stat.split(': ')[1].split(' ')[0])
+
 
         return None
 
@@ -274,7 +268,7 @@ class QueryResult(object):
 
     @property
     def cached_execution(self):
-        return self._get_stat(self.CACHED_EXECUTION)
+        return True if self._get_stat(self.CACHED_EXECUTION) == 1 else False
 
     @property
     def run_time_ms(self):
