@@ -33,6 +33,7 @@ class QueryResult(object):
     RELATIONSHIPS_CREATED = 'Relationships created'
     INDICES_CREATED = "Indices created"
     INDICES_DELETED = "Indices deleted"
+    CACHED_EXECUTION = "Cached execution"
     INTERNAL_EXECUTION_TIME = 'internal execution time'
 
     def __init__(self, graph, response):
@@ -64,7 +65,7 @@ class QueryResult(object):
 
         stats = [self.LABELS_ADDED, self.NODES_CREATED, self.PROPERTIES_SET, self.RELATIONSHIPS_CREATED,
                  self.NODES_DELETED, self.RELATIONSHIPS_DELETED, self.INDICES_CREATED, self.INDICES_DELETED,
-                 self.INTERNAL_EXECUTION_TIME]
+                 self.CACHED_EXECUTION, self.INTERNAL_EXECUTION_TIME]
         for s in stats:
             v = self._get_value(s, raw_statistics)
             if v is not None:
@@ -227,6 +228,7 @@ class QueryResult(object):
             if prop in stat:
                 return float(stat.split(': ')[1].split(' ')[0])
 
+
         return None
 
     def _get_stat(self, stat):
@@ -263,6 +265,10 @@ class QueryResult(object):
     @property
     def indices_deleted(self):
         return self._get_stat(self.INDICES_DELETED)
+
+    @property
+    def cached_execution(self):
+        return self._get_stat(self.CACHED_EXECUTION) == 1
 
     @property
     def run_time_ms(self):
