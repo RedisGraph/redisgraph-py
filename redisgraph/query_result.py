@@ -268,7 +268,7 @@ class QueryResult(object):
 
     @property
     def cached_execution(self):
-        return True if self._get_stat(self.CACHED_EXECUTION) == 1 else False
+        return self._get_stat(self.CACHED_EXECUTION) == 1
 
     @property
     def run_time_ms(self):
