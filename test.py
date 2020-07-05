@@ -195,7 +195,7 @@ class TestStringMethods(unittest.TestCase):
         self.assertFalse(uncached_result.cached_execution)
         
         # loop to make sure the query is cached on each thread on server
-        for x in range(0, 32): 
+        for x in range(0, 64): 
             cached_result = redis_graph.query("MATCH (n) RETURN n, $param", {'param': [0]})
             self.assertEqual(uncached_result.result_set, cached_result.result_set)
 
