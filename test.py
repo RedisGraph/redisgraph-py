@@ -191,16 +191,30 @@ class TestStringMethods(unittest.TestCase):
         redis_graph = Graph('cached', self.r)
         redis_graph.query("CREATE ()")
         
-        uncached_result = redis_graph.query("MATCH (n) RETURN n")
+        uncached_result = redis_graph.query("MATCH (n) RETURN n, $param", {'param': [0]})
         self.assertFalse(uncached_result.cached_execution)
         
         # loop to make sure the query is cached on each thread on server
         for x in range(0, 32): 
-            cached_result = redis_graph.query("MATCH (n) RETURN n")
+            cached_result = redis_graph.query("MATCH (n) RETURN n, $param", {'param': [0]})
             self.assertEqual(uncached_result.result_set, cached_result.result_set)
 
         # should be cached on all threads by now
         self.assertTrue(cached_result.cached_execution)
+        
+        redis_graph.delete()
+        
+        
+    def test_execution_plan(self):
+        redis_graph = Graph('execution_plan', self.r)
+        create_query = """CREATE (:Rider {name:'Valentino Rossi'})-[:rides]->(:Team {name:'Yamaha'}), 
+        (:Rider {name:'Dani Pedrosa'})-[:rides]->(:Team {name:'Honda'}), 
+        (:Rider {name:'Andrea Dovizioso'})-[:rides]->(:Team {name:'Ducati'})"""
+        redis_graph.query(create_query)
+        
+        result = redis_graph.execution_plan("MATCH (r:Rider)-[:rides]->(t:Team) WHERE t.name = $name RETURN r.name, t.name, $params", {'name': 'Yehuda'})
+        expected = "Results\n    Project\n        Conditional Traverse | (t:Team)->(r:Rider)\n            Filter\n                Node By Label Scan | (t:Team)"
+        self.assertEqual(result, expected)
         
         redis_graph.delete()
 
