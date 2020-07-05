@@ -190,11 +190,18 @@ class TestStringMethods(unittest.TestCase):
     def test_cached_execution(self):
         redis_graph = Graph('cached', self.r)
         redis_graph.query("CREATE ()")
+        
         uncached_result = redis_graph.query("MATCH (n) RETURN n")
-        cached_result = redis_graph.query("MATCH (n) RETURN n")
-        self.assertEqual(uncached_result.result_set, cached_result.result_set)
         self.assertFalse(uncached_result.cached_execution)
+        
+        # loop to make sure the query is cached on each thread on server
+        for x in range(0, 32): 
+            cached_result = redis_graph.query("MATCH (n) RETURN n")
+            self.assertEqual(uncached_result.result_set, cached_result.result_set)
+
+        # should be cached on all threads by now
         self.assertTrue(cached_result.cached_execution)
+        
         redis_graph.delete()
 
 if __name__ == '__main__':
