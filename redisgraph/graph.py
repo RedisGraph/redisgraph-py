@@ -124,21 +124,22 @@ class Graph(object):
         if params is not None:
             q = self.build_params_header(params) + q
 
-        statistics = None
-        result_set = None
-
         response = self.redis_con.execute_command("GRAPH.QUERY", self.name, q, "--compact")
         return QueryResult(self, response)
 
     def _execution_plan_to_string(self, plan):
-        return b"\n".join(plan)
+        return "\n".join(plan)
 
-    def execution_plan(self, query):
+    def execution_plan(self, query, params=None):
         """
         Get the execution plan for given query,
         GRAPH.EXPLAIN returns an array of operations.
         """
-        plan = self.redis_con.execute_command("GRAPH.EXPLAIN", self.name, query)
+        
+        if params is not None:
+            query = self.build_params_header(params) + query
+        
+        plan = self.redis_con.execute_command("GRAPH.EXPLAIN", self.name, query, query)
         return self._execution_plan_to_string(plan)
 
     def delete(self):
