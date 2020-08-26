@@ -117,14 +117,17 @@ class Graph(object):
             params_header += str(key) + "=" + str(value) + " "
         return params_header
 
-    def query(self, q, params=None):
+    def query(self, q, params=None, timeout=None):
         """
         Executes a query against the graph.
         """
         if params is not None:
             q = self.build_params_header(params) + q
 
-        response = self.redis_con.execute_command("GRAPH.QUERY", self.name, q, "--compact")
+        command = ["GRAPH.QUERY", self.name, q, "--compact"]
+        if timeout:
+            command += ["timeout", timeout]
+        response = self.redis_con.execute_command(*command)
         return QueryResult(self, response)
 
     def _execution_plan_to_string(self, plan):

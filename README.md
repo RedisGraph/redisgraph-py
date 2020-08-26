@@ -51,6 +51,8 @@ result = redis_graph.query(query, params)
 # Print resultset
 result.pretty_print()
 
+# Use query timeout to raise an exception if the query takes over 10 milliseconds
+result = redis_graph.query(query, params, timeout=10)
 
 # Iterate through resultset
 for record in result.result_set:
