@@ -231,6 +231,13 @@ class TestStringMethods(unittest.TestCase):
             # Expecting an error.
             pass
 
+        try:
+            redis_graph.query("RETURN 1", timeout="str")
+            assert(False)
+        except Exception as e:
+            assert("Timeout argument must be a positive integer" in e.args)
+            # Expecting an error.
+            pass
 
 if __name__ == '__main__':
     unittest.main()

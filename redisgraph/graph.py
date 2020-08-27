@@ -126,6 +126,8 @@ class Graph(object):
 
         command = ["GRAPH.QUERY", self.name, q, "--compact"]
         if timeout:
+            if not isinstance(timeout, int):
+                raise Exception("Timeout argument must be a positive integer")
             command += ["timeout", timeout]
         response = self.redis_con.execute_command(*command)
         return QueryResult(self, response)
