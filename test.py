@@ -218,5 +218,26 @@ class TestStringMethods(unittest.TestCase):
         
         redis_graph.delete()
 
+    def test_query_timeout(self):
+        redis_graph = Graph('timeout', self.r)
+        # Build a sample graph with 1000 nodes.
+        redis_graph.query("UNWIND range(0,1000) as val CREATE ({v: val})")
+        # Issue a long-running query with a 1-millisecond timeout.
+        try:
+            redis_graph.query("MATCH (a), (b), (c), (d) RETURN *", timeout=1)
+            assert(False)
+        except redis.exceptions.ResponseError as e:
+            assert("Query timed out" in e.args)
+            # Expecting an error.
+            pass
+
+        try:
+            redis_graph.query("RETURN 1", timeout="str")
+            assert(False)
+        except Exception as e:
+            assert("Timeout argument must be a positive integer" in e.args)
+            # Expecting an error.
+            pass
+
 if __name__ == '__main__':
     unittest.main()
