@@ -19,13 +19,13 @@ setup(
     packages=find_packages(),
     install_requires=requirements,
     classifiers=[
-        'Development Status :: 4 - Beta',
+        'Topic :: Database',
+        'Programming Language :: Python',
         'Intended Audience :: Developers',
         'License :: OSI Approved :: BSD License',
-        'Programming Language :: Python :: 2.7',
-        'Topic :: Database'
+        'Development Status :: 5 - Production/Stable'
     ],
-    keywords='Redis Graph Extension',
     author='RedisLabs',
+    keywords='Redis Graph',
     author_email='oss@redislabs.com'
 )

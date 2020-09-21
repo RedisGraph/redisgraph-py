@@ -16,7 +16,7 @@ class Node(object):
     def toString(self):
         res = ""
         if self.properties:
-            props = ','.join(key+':'+str(quote_string(val)) for key, val in self.properties.items())
+            props = ','.join(key+':'+str(quote_string(val)) for key, val in sorted(self.properties.items()))
             res += '{' + props + '}'
 
         return res
@@ -28,7 +28,7 @@ class Node(object):
         if self.label:
             res += ':' + self.label
         if self.properties:
-            props = ','.join(key+':'+str(quote_string(val)) for key, val in self.properties.items())
+            props = ','.join(key+':'+str(quote_string(val)) for key, val in sorted(self.properties.items()))
             res += '{' + props + '}'
         res += ')'
 

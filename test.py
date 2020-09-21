@@ -37,7 +37,7 @@ class TestStringMethods(unittest.TestCase):
         result = redis_graph.query(query)
         self.assertEqual([1, 2.3, "4", True, False, None], result.result_set[0][0])
 
-		# All done, remove graph.
+        # All done, remove graph.
         redis_graph.delete()
 
     def test_array_functions(self):
@@ -46,48 +46,37 @@ class TestStringMethods(unittest.TestCase):
         query = """CREATE (p:person{name:'a',age:32, array:[0,1,2]})"""
         redis_graph.query(query)
 
-        query = """CREATE (p:person{name:'b',age:30, array:[3,4,5]})"""
-        redis_graph.query(query)
-
         query = """WITH [0,1,2] as x return x"""
         result = redis_graph.query(query)
         self.assertEqual([0, 1, 2], result.result_set[0][0])
 
-        query = """MATCH(n) return collect(n) as x"""
+        query = """MATCH(n) return collect(n)"""
         result = redis_graph.query(query)
 
-        a = Node(label='person', properties={'name': 'a', 'age': 32, 'array': [0, 1, 2]})
-        b = Node(label='person', properties={'name': 'b', 'age': 30, 'array': [3, 4, 5]})
+        a = Node(node_id=0, label='person', properties={'name': 'a', 'age': 32, 'array': [0, 1, 2]})
 
-        self.assertEqual([a, b], result.result_set[0][0])
-
+        self.assertEqual([a], result.result_set[0][0])
 
         # All done, remove graph.
         redis_graph.delete()
-
 
     def test_path(self):
         redis_graph = Graph('social', self.r)
 
         node0 = Node(node_id=0, label="L1")
         node1 = Node(node_id=1, label="L1")
-        node2 = Node(node_id=2, label="L1")
         edge01 = Edge(node0, "R1", node1, edge_id=0, properties={'value': 1})
-        edge12 = Edge(node1, "R1", node2, edge_id=1, properties={'value': 2})
 
         redis_graph.add_node(node0)
         redis_graph.add_node(node1)
-        redis_graph.add_node(node2)
         redis_graph.add_edge(edge01)
-        redis_graph.add_edge(edge12)
 
         redis_graph.flush()
 
         path01 = Path.new_empty_path().add_node(node0).add_edge(edge01).add_node(node1)
-        path12 = Path.new_empty_path().add_node(node1).add_edge(edge12).add_node(node2)
-        expected_results = [[path01], [path12]]
+        expected_results = [[path01]]
 
-        query = "MATCH p=(:L1)-[:R1]->(:L1) RETURN p"
+        query = "MATCH p=(:L1)-[:R1]->(:L1) RETURN p ORDER BY p"
         result = redis_graph.query(query)
         self.assertEqual(expected_results, result.result_set)
 
@@ -139,9 +128,9 @@ class TestStringMethods(unittest.TestCase):
         redis_graph.add_edge(edge)
 
         self.assertEqual(str(john),
-                         """(a:person{name:"John Doe",age:33,gender:"male",status:"single"})""")
+                         """(a:person{age:33,gender:"male",name:"John Doe",status:"single"})""")
         self.assertEqual(str(edge),
-                         """(a:person{name:"John Doe",age:33,gender:"male",status:"single"})""" +
+                         """(a:person{age:33,gender:"male",name:"John Doe",status:"single"})""" +
                          """-[:visited{purpose:"pleasure"}]->""" +
                          """(b:country{name:"Japan"})""")
         self.assertEqual(str(japan), """(b:country{name:"Japan"})""")
@@ -156,7 +145,7 @@ class TestStringMethods(unittest.TestCase):
         visit = result.result_set[0][1]
         country = result.result_set[0][2]
 
-        self.assertEqual(str(person), """(:person{name:"John Doe",age:33,gender:"male",status:"single"})""")
+        self.assertEqual(str(person), """(:person{age:33,gender:"male",name:"John Doe",status:"single"})""")
         self.assertEqual(str(visit), """()-[:visited{purpose:"pleasure"}]->()""")
         self.assertEqual(str(country), """(:country{name:"Japan"})""")
 
