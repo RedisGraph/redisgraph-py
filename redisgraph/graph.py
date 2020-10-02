@@ -90,7 +90,7 @@ class Graph(object):
         query += ','.join([str(edge) for edge in self.edges])
 
         # Discard leading comma.
-        if query[-1] is ',':
+        if query[-1] == ',':
             query = query[:-1]
 
         return self.query(query)
