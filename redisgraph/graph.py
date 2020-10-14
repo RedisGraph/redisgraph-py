@@ -1,5 +1,6 @@
 from .util import *
 from .query_result import QueryResult
+
 class Graph(object):
     """
     Graph, collection of nodes and edges.
@@ -9,7 +10,8 @@ class Graph(object):
         """
         Create a new graph.
         """
-        self.name = name
+        self.name = name             # Graph key
+        self.version = None          # Graph version
         self.redis_con = redis_con
         self.nodes = {}
         self.edges = []
@@ -17,17 +19,41 @@ class Graph(object):
         self._properties = []        # List of properties.
         self._relationshipTypes = [] # List of relation types.
 
+    def _refresh_schema(self):
+        self._refresh_labels()
+        self._refresh_relations()
+        self._refresh_attributes()
+
+    def _refresh_labels(self):
+        lbls = self.labels()
+
+        # Unpack data.
+        self._labels = [None] * len(lbls)
+        for i, l in enumerate(lbls):
+            self._labels[i] = l[0]
+
+    def _refresh_relations(self):
+        rels = self.relationshipTypes()
+
+        # Unpack data.
+        self._relationshipTypes = [None] * len(rels)
+        for i, r in enumerate(rels):
+            self._relationshipTypes[i] = r[0]
+
+    def _refresh_attributes(self):
+        props = self.propertyKeys()
+
+        # Unpack data.
+        self._properties = [None] * len(props)
+        for i, p in enumerate(props):
+            self._properties[i] = p[0]
+
     def get_label(self, idx):
         try:
             label = self._labels[idx]
         except IndexError:
-            # Refresh graph labels.
-            lbls = self.labels()
-            # Unpack data.
-            self._labels = [None] * len(lbls)
-            for i, l in enumerate(lbls):
-                self._labels[i] = l[0]
-
+            # Refresh labels.
+            self._refresh_labels()
             label = self._labels[idx]
         return label
 
@@ -35,13 +61,8 @@ class Graph(object):
         try:
             relationshipType = self._relationshipTypes[idx]
         except IndexError:
-            # Refresh graph relations.
-            rels = self.relationshipTypes()
-            # Unpack data.
-            self._relationshipTypes = [None] * len(rels)
-            for i, r in enumerate(rels):
-                self._relationshipTypes[i] = r[0]
-
+            # Refresh relationship types.
+            self._refresh_relations()
             relationshipType = self._relationshipTypes[idx]
         return relationshipType
 
@@ -50,12 +71,7 @@ class Graph(object):
             propertie = self._properties[idx]
         except IndexError:
             # Refresh properties.
-            props = self.propertyKeys()
-            # Unpack data.
-            self._properties = [None] * len(props)
-            for i, p in enumerate(props):
-                self._properties[i] = p[0]
-
+            self._refresh_attributes()
             propertie = self._properties[idx]
         return propertie
 
