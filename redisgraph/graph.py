@@ -19,7 +19,13 @@ class Graph(object):
         self._properties = []        # List of properties.
         self._relationshipTypes = [] # List of relation types.
 
+    def _clear_schema(self):
+        self._labels = []
+        self._properties = []
+        self._relationshipTypes = []
+
     def _refresh_schema(self):
+        self._clear_schema()
         self._refresh_labels()
         self._refresh_relations()
         self._refresh_attributes()
@@ -167,6 +173,7 @@ class Graph(object):
         """
         Deletes graph.
         """
+        self._clear_schema()
         return self.redis_con.execute_command("GRAPH.DELETE", self.name)
     
     def merge(self, pattern):
