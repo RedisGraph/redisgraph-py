@@ -1,6 +1,8 @@
 import random
 import string
 
+__all__ = ['random_string', 'quote_string']
+
 def random_string(length=10):
     """
     Returns a random N chracter long string.
