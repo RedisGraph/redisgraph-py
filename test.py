@@ -90,6 +90,27 @@ class TestStringMethods(unittest.TestCase):
         # All done, remove graph.
         redis_graph.delete()
 
+    def test_edge(self):
+        edge1 = Edge('john', 'visited', 'japan', properties={'purpose': 'pleasure'})
+        edge2 = Edge('john', 'visited', 'japan', properties={'purpose': 'pleasure'})
+        self.assertEqual(edge1, edge2)
+
+        edge3 = Edge('ari', 'visited', 'japan', properties={'purpose': 'pleasure'})
+        self.assertNotEqual(edge2, edge3)
+  
+        edge4 = Edge('john', 'resident', 'japan', properties={'purpose': 'pleasure'})
+        self.assertNotEqual(edge1, edge4)
+
+        edge5 = Edge('john', 'visited', 'greece', properties={'purpose': 'pleasure'})
+        self.assertNotEqual(edge2, edge5)
+
+        edge6 = Edge('john', 'visited', 'greece', properties={'purpose': 'business'})
+        self.assertNotEqual(edge5, edge6)
+
+        edge7 = Edge('john', 'visited', 'greece', properties={'purpose': 'pleasure', 'budget': '$1000'})
+        self.assertNotEqual(edge6, edge7)
+
+
     def test_param(self):
         redis_graph = Graph('params', self.r)
 
