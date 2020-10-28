@@ -4,6 +4,7 @@
 [![GitHub issues](https://img.shields.io/github/release/RedisGraph/redisgraph-py.svg)](https://github.com/RedisGraph/redisgraph-py/releases/latest)
 [![Codecov](https://codecov.io/gh/RedisGraph/redisgraph-py/branch/master/graph/badge.svg)](https://codecov.io/gh/RedisGraph/redisgraph-py)
 [![Known Vulnerabilities](https://snyk.io/test/github/RedisGraph/redisgraph-py/badge.svg?targetFile=requirements.txt)](https://snyk.io/test/github/RedisGraph/redisgraph-py?targetFile=requirements.txt)
+[![Total alerts](https://img.shields.io/lgtm/alerts/g/RedisGraph/redisgraph-py.svg?logo=lgtm&logoWidth=18)](https://lgtm.com/projects/g/RedisGraph/redisgraph-py/alerts/)
 
 # redisgraph-py
 [![Forum](https://img.shields.io/badge/Forum-RedisGraph-blue)](https://forum.redislabs.com/c/modules/redisgraph)
