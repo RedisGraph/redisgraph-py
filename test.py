@@ -74,6 +74,12 @@ class TestStringMethods(unittest.TestCase):
         redis_graph.flush()
 
         path01 = Path.new_empty_path().add_node(node0).add_edge(edge01).add_node(node1)
+        self.assertEqual(node1, path01.get_node(1))
+        self.assertEqual(edge01, path01.get_relationship(0))
+        self.assertEqual(node0, path01.first_node())
+        self.assertEqual(node1, path01.last_node())
+        self.assertEqual(1, path01.edge_count())
+        self.assertEqual(2, path01.nodes_count())
         expected_results = [[path01]]
 
         query = "MATCH p=(:L1)-[:R1]->(:L1) RETURN p ORDER BY p"
