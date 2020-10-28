@@ -80,6 +80,7 @@ class TestStringMethods(unittest.TestCase):
         self.assertEqual(node1, path01.last_node())
         self.assertEqual(1, path01.edge_count())
         self.assertEqual(2, path01.nodes_count())
+        self.assertEqual("", str(path01))
         expected_results = [[path01]]
 
         query = "MATCH p=(:L1)-[:R1]->(:L1) RETURN p ORDER BY p"
