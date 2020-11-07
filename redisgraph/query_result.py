@@ -1,6 +1,7 @@
 from .node import Node
 from .edge import Edge
 from .path import Path
+from .exceptions import VersionMismatchException
 from prettytable import PrettyTable
 from redis import ResponseError
 
@@ -14,11 +15,10 @@ INDICES_CREATED = "Indices created"
 INDICES_DELETED = "Indices deleted"
 CACHED_EXECUTION = "Cached execution"
 INTERNAL_EXECUTION_TIME = 'internal execution time'
-GRAPH_VERSION = 'Graph version'
 
 STATS = [LABELS_ADDED, NODES_CREATED, PROPERTIES_SET, RELATIONSHIPS_CREATED,
         NODES_DELETED, RELATIONSHIPS_DELETED, INDICES_CREATED, INDICES_DELETED,
-        CACHED_EXECUTION, INTERNAL_EXECUTION_TIME, GRAPH_VERSION]
+        CACHED_EXECUTION, INTERNAL_EXECUTION_TIME]
 
 class ResultSetColumnTypes(object):
     COLUMN_UNKNOWN = 0
@@ -45,24 +45,27 @@ class QueryResult(object):
         self.header = []
         self.result_set = []
 
-        # If we encountered a run-time error, the last response element will be an exception.
-        if isinstance(response[-1], ResponseError):
-            raise response[-1]
+        # incase of an error an exception will be raised
+        self._check_for_errors(response)
 
         if len(response) == 1:
             self.parse_statistics(response[0])
         else:
-            # start by parsing statistics, see if the reported graph version
-            # matches the one we have
+            # start by parsing statistics, matches the one we have
             self.parse_statistics(response[-1])  # Last element.
-
-            if(graph.version != self.graph_version):
-                # graph version miss-match, this is an indication that
-                # the graph schema was modified, sync it.
-                graph.version = self.graph_version
-                graph._refresh_schema()
-
             self.parse_results(response)
+
+    def _check_for_errors(self, response):
+        if isinstance(response[0], ResponseError):
+            error = response[0]
+            if str(error) == "version mismatch":
+                version = response[1]
+                error = VersionMismatchException(version)
+            raise error
+
+        # If we encountered a run-time error, the last response element will be an exception.
+        if isinstance(response[-1], ResponseError):
+            raise response[-1]
 
     def parse_results(self, raw_result_set):
         self.header = self.parse_header(raw_result_set)
@@ -285,8 +288,4 @@ class QueryResult(object):
     @property
     def run_time_ms(self):
         return self._get_stat(INTERNAL_EXECUTION_TIME)
-
-    @property
-    def graph_version(self):
-        return self._get_stat(GRAPH_VERSION)
 

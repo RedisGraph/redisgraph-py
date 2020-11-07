@@ -1,5 +1,6 @@
 from .util import *
 from .query_result import QueryResult
+from .exceptions import VersionMismatchException
 
 class Graph(object):
     """
@@ -11,7 +12,7 @@ class Graph(object):
         Create a new graph.
         """
         self.name = name             # Graph key
-        self.version = None          # Graph version
+        self.version = 0             # Graph version
         self.redis_con = redis_con
         self.nodes = {}
         self.edges = []
@@ -143,16 +144,37 @@ class Graph(object):
         """
         Executes a query against the graph.
         """
-        if params is not None:
-            q = self.build_params_header(params) + q
 
-        command = ["GRAPH.QUERY", self.name, q, "--compact"]
+        # maintain original 'q'
+        query = q
+
+        # handle query parameters
+        if params is not None:
+            query = self.build_params_header(params) + query
+
+        # construct query command
+        # ask for compact result-set format
+        # specify known version
+        command = ["GRAPH.QUERY", self.name, query, "--compact", "version", self.version]
+
+        # include timeout is specified
         if timeout:
             if not isinstance(timeout, int):
                 raise Exception("Timeout argument must be a positive integer")
             command += ["timeout", timeout]
+
+        # issue query
         response = self.redis_con.execute_command(*command)
-        return QueryResult(self, response)
+
+        try:
+            return QueryResult(self, response)
+        except VersionMismatchException as e:
+            # client view over the graph schema is out of sync
+            # set client version and refresh local schema
+            self.version = e.version
+            self._refresh_schema()
+            # re-issue query
+            return self.query(q, params, timeout)
 
     def _execution_plan_to_string(self, plan):
         return "\n".join(plan)
