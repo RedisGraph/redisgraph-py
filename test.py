@@ -228,5 +228,75 @@ class TestStringMethods(unittest.TestCase):
             # Expecting an error.
             pass
 
+    def test_cache_sync(self):
+        # This test verifies that client internal graph schema cache stays
+        # in sync with the graph schema
+        #
+        # Client B will try to get Client A out of sync by:
+        # 1. deleting the graph
+        # 2. reconstructing the graph in a different order, this will casuse
+        #    a differance in the current mapping between string IDs and the
+        #    mapping Client A is aware of
+        #
+        # Client A should pick up on the changes by comparing graph versions
+        # and resyncing its cache.
+
+        A = Graph('cache-sync', self.r)
+        B = Graph('cache-sync', self.r)
+
+        # Build order:
+        # 1. introduce label 'L' and 'K'
+        # 2. introduce attribute 'x' and 'q'
+        # 3. introduce relationship-type 'R' and 'S'
+
+        A.query("CREATE (:L)")
+        B.query("CREATE (:K)")
+        A.query("MATCH (n) SET n.x = 1")
+        B.query("MATCH (n) SET n.q = 1")
+        A.query("MATCH (n) CREATE (n)-[:R]->()")
+        B.query("MATCH (n) CREATE (n)-[:S]->()")
+
+        # Cause client A to populate its cache
+        A.query("MATCH (n)-[e]->() RETURN n, e")
+
+        assert(len(A._labels) == 2)
+        assert(len(A._properties) == 2)
+        assert(len(A._relationshipTypes) == 2)
+        assert(A._labels[0] == 'L')
+        assert(A._labels[1] == 'K')
+        assert(A._properties[0] == 'x')
+        assert(A._properties[1] == 'q')
+        assert(A._relationshipTypes[0] == 'R')
+        assert(A._relationshipTypes[1] == 'S')
+
+        # Have client B reconstruct the graph in a different order.
+        B.delete()
+
+        # Build order:
+        # 1. introduce relationship-type 'R'
+        # 2. introduce label 'L'
+        # 3. introduce attribute 'x'
+        B.query("CREATE ()-[:S]->()")
+        B.query("CREATE ()-[:R]->()")
+        B.query("CREATE (:K)")
+        B.query("CREATE (:L)")
+        B.query("MATCH (n) SET n.q = 1")
+        B.query("MATCH (n) SET n.x = 1")
+
+        # A's internal cached mapping is now out of sync
+        # issue a query and make sure A's cache is synced.
+        A.query("MATCH (n)-[e]->() RETURN n, e")
+
+        assert(len(A._labels) == 2)
+        assert(len(A._properties) == 2)
+        assert(len(A._relationshipTypes) == 2)
+        assert(A._labels[0] == 'K')
+        assert(A._labels[1] == 'L')
+        assert(A._properties[0] == 'q')
+        assert(A._properties[1] == 'x')
+        assert(A._relationshipTypes[0] == 'S')
+        assert(A._relationshipTypes[1] == 'R')
+
 if __name__ == '__main__':
     unittest.main()
+

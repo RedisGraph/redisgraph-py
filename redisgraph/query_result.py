@@ -1,16 +1,30 @@
 from .node import Node
 from .edge import Edge
 from .path import Path
+from .exceptions import VersionMismatchException
 from prettytable import PrettyTable
 from redis import ResponseError
 
+LABELS_ADDED = 'Labels added'
+NODES_CREATED = 'Nodes created'
+NODES_DELETED = 'Nodes deleted'
+RELATIONSHIPS_DELETED = 'Relationships deleted'
+PROPERTIES_SET = 'Properties set'
+RELATIONSHIPS_CREATED = 'Relationships created'
+INDICES_CREATED = "Indices created"
+INDICES_DELETED = "Indices deleted"
+CACHED_EXECUTION = "Cached execution"
+INTERNAL_EXECUTION_TIME = 'internal execution time'
+
+STATS = [LABELS_ADDED, NODES_CREATED, PROPERTIES_SET, RELATIONSHIPS_CREATED,
+        NODES_DELETED, RELATIONSHIPS_DELETED, INDICES_CREATED, INDICES_DELETED,
+        CACHED_EXECUTION, INTERNAL_EXECUTION_TIME]
 
 class ResultSetColumnTypes(object):
     COLUMN_UNKNOWN = 0
     COLUMN_SCALAR = 1
     COLUMN_NODE = 2       # Unused as of RedisGraph v2.1.0, retained for backwards compatibility.
     COLUMN_RELATION = 3   # Unused as of RedisGraph v2.1.0, retained for backwards compatibility.
-
 
 class ResultSetScalarTypes(object):
     VALUE_UNKNOWN = 0
@@ -25,31 +39,33 @@ class ResultSetScalarTypes(object):
     VALUE_PATH = 9
 
 class QueryResult(object):
-    LABELS_ADDED = 'Labels added'
-    NODES_CREATED = 'Nodes created'
-    NODES_DELETED = 'Nodes deleted'
-    RELATIONSHIPS_DELETED = 'Relationships deleted'
-    PROPERTIES_SET = 'Properties set'
-    RELATIONSHIPS_CREATED = 'Relationships created'
-    INDICES_CREATED = "Indices created"
-    INDICES_DELETED = "Indices deleted"
-    CACHED_EXECUTION = "Cached execution"
-    INTERNAL_EXECUTION_TIME = 'internal execution time'
 
     def __init__(self, graph, response):
         self.graph = graph
         self.header = []
         self.result_set = []
 
-        # If we encountered a run-time error, the last response element will be an exception.
-        if isinstance(response[-1], ResponseError):
-            raise response[-1]
+        # incase of an error an exception will be raised
+        self._check_for_errors(response)
 
         if len(response) == 1:
             self.parse_statistics(response[0])
         else:
-            self.parse_results(response)
+            # start by parsing statistics, matches the one we have
             self.parse_statistics(response[-1])  # Last element.
+            self.parse_results(response)
+
+    def _check_for_errors(self, response):
+        if isinstance(response[0], ResponseError):
+            error = response[0]
+            if str(error) == "version mismatch":
+                version = response[1]
+                error = VersionMismatchException(version)
+            raise error
+
+        # If we encountered a run-time error, the last response element will be an exception.
+        if isinstance(response[-1], ResponseError):
+            raise response[-1]
 
     def parse_results(self, raw_result_set):
         self.header = self.parse_header(raw_result_set)
@@ -63,10 +79,12 @@ class QueryResult(object):
     def parse_statistics(self, raw_statistics):
         self.statistics = {}
 
-        stats = [self.LABELS_ADDED, self.NODES_CREATED, self.PROPERTIES_SET, self.RELATIONSHIPS_CREATED,
-                 self.NODES_DELETED, self.RELATIONSHIPS_DELETED, self.INDICES_CREATED, self.INDICES_DELETED,
-                 self.CACHED_EXECUTION, self.INTERNAL_EXECUTION_TIME]
-        for s in stats:
+        # decode statistics
+        for idx, stat in enumerate(raw_statistics):
+            if isinstance(stat, bytes):
+                raw_statistics[idx] = stat.decode()
+
+        for s in STATS:
             v = self._get_value(s, raw_statistics)
             if v is not None:
                 self.statistics[s] = v
@@ -223,11 +241,8 @@ class QueryResult(object):
     @staticmethod
     def _get_value(prop, statistics):
         for stat in statistics:
-            if isinstance(stat, bytes):
-                stat = stat.decode()
             if prop in stat:
                 return float(stat.split(': ')[1].split(' ')[0])
-
 
         return None
 
@@ -236,40 +251,41 @@ class QueryResult(object):
 
     @property
     def labels_added(self):
-        return self._get_stat(self.LABELS_ADDED)
+        return self._get_stat(LABELS_ADDED)
 
     @property
     def nodes_created(self):
-        return self._get_stat(self.NODES_CREATED)
+        return self._get_stat(NODES_CREATED)
 
     @property
     def nodes_deleted(self):
-        return self._get_stat(self.NODES_DELETED)
+        return self._get_stat(NODES_DELETED)
 
     @property
     def properties_set(self):
-        return self._get_stat(self.PROPERTIES_SET)
+        return self._get_stat(PROPERTIES_SET)
 
     @property
     def relationships_created(self):
-        return self._get_stat(self.RELATIONSHIPS_CREATED)
+        return self._get_stat(RELATIONSHIPS_CREATED)
 
     @property
     def relationships_deleted(self):
-        return self._get_stat(self.RELATIONSHIPS_DELETED)
+        return self._get_stat(RELATIONSHIPS_DELETED)
 
     @property
     def indices_created(self):
-        return self._get_stat(self.INDICES_CREATED)
+        return self._get_stat(INDICES_CREATED)
 
     @property
     def indices_deleted(self):
-        return self._get_stat(self.INDICES_DELETED)
+        return self._get_stat(INDICES_DELETED)
 
     @property
     def cached_execution(self):
-        return self._get_stat(self.CACHED_EXECUTION) == 1
+        return self._get_stat(CACHED_EXECUTION) == 1
 
     @property
     def run_time_ms(self):
-        return self._get_stat(self.INTERNAL_EXECUTION_TIME)
+        return self._get_stat(INTERNAL_EXECUTION_TIME)
+
