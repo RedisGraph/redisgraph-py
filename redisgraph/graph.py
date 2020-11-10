@@ -1,4 +1,5 @@
 from .util import *
+import redis
 from .query_result import QueryResult
 from .exceptions import VersionMismatchException
 
@@ -11,14 +12,14 @@ class Graph(object):
         """
         Create a new graph.
         """
-        self.name = name             # Graph key
-        self.version = 0             # Graph version
+        self.name = name                 # Graph key
         self.redis_con = redis_con
         self.nodes = {}
         self.edges = []
-        self._labels = []            # List of node labels.
-        self._properties = []        # List of properties.
-        self._relationshipTypes = [] # List of relation types.
+        self._labels = []                # List of node labels.
+        self._properties = []            # List of properties.
+        self._relationshipTypes = []     # List of relation types.
+        self.version = 0                 # Graph version
 
     def _clear_schema(self):
         self._labels = []
@@ -154,7 +155,7 @@ class Graph(object):
 
         # construct query command
         # ask for compact result-set format
-        # specify known version
+        # specify known graph version
         command = ["GRAPH.QUERY", self.name, query, "--compact", "version", self.version]
 
         # include timeout is specified
@@ -164,10 +165,13 @@ class Graph(object):
             command += ["timeout", timeout]
 
         # issue query
-        response = self.redis_con.execute_command(*command)
-
         try:
+            response = self.redis_con.execute_command(*command)
             return QueryResult(self, response)
+        except redis.exceptions.ResponseError as e:
+            if "wrong number of arguments" in str(e):
+                print ("Note: RedisGraph Python requires server version 2.2.8 or above")
+            raise e
         except VersionMismatchException as e:
             # client view over the graph schema is out of sync
             # set client version and refresh local schema
