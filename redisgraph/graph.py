@@ -8,12 +8,13 @@ class Graph(object):
     Graph, collection of nodes and edges.
     """
 
-    def __init__(self, name, redis_con):
+    def __init__(self, name, redis_con, read_only=False):
         """
         Create a new graph.
         """
         self.name = name                 # Graph key
         self.redis_con = redis_con
+        self.read_only = read_only       # Readonly Graph
         self.nodes = {}
         self.edges = []
         self._labels = []                # List of node labels.
@@ -156,7 +157,7 @@ class Graph(object):
         # construct query command
         # ask for compact result-set format
         # specify known graph version
-        command = ["GRAPH.QUERY", self.name, query, "--compact", "version", self.version]
+        command = ["GRAPH.RO_QUERY" if self.read_only else "GRAPH.QUERY", self.name, query, "--compact", "version", self.version]
 
         # include timeout is specified
         if timeout:
