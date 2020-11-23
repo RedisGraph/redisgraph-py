@@ -232,9 +232,6 @@ class TestStringMethods(unittest.TestCase):
 
     def test_read_only_query(self):
         redis_graph = Graph('read_only', self.r)
-	
-        # Build a sample graph with 10 nodes.
-        redis_graph.query("UNWIND range(0, 10) as val CREATE ({v: val})")
 
         try:
             # Issue a write query, specifying read-only true, this call should fail.
