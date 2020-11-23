@@ -228,6 +228,22 @@ class TestStringMethods(unittest.TestCase):
             # Expecting an error.
             pass
 
+
+    def test_read_only_query(self):
+        redis_graph = Graph('read_only', self.r)
+        # Build a sample graph with 10 nodes.
+        redis_graph.query("UNWIND range(0,10) as val CREATE ({v: val})", read_only=False)
+        
+        redis_graph.query("MATCH (a), (b), (c), (d) RETURN *", read_only=True)
+
+        try:
+            redis_graph.query("CREATE (p:person{name:'a',age:32, array:[0,1,2]})")
+            assert(False)
+        except Exception as e:
+            # Expecting an error.
+            pass
+
+
     def test_cache_sync(self):
         # This test verifies that client internal graph schema cache stays
         # in sync with the graph schema
