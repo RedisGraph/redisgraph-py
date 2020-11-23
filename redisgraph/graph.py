@@ -141,7 +141,7 @@ class Graph(object):
             params_header += str(key) + "=" + str(value) + " "
         return params_header
 
-    def query(self, q, params=None, timeout=None):
+    def query(self, q, params=None, timeout=None, read_only=False):
         """
         Executes a query against the graph.
         """
@@ -156,7 +156,7 @@ class Graph(object):
         # construct query command
         # ask for compact result-set format
         # specify known graph version
-        command = ["GRAPH.QUERY", self.name, query, "--compact", "version", self.version]
+        command = [("GRAPH.QUERY","GRAPH.RO_QUERY")[read_only], self.name, query, "--compact", "version", self.version]
 
         # include timeout is specified
         if timeout:
