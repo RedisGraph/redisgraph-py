@@ -207,6 +207,7 @@ class TestStringMethods(unittest.TestCase):
         
         redis_graph.delete()
 
+
     def test_query_timeout(self):
         redis_graph = Graph('timeout', self.r)
         # Build a sample graph with 1000 nodes.
@@ -231,13 +232,13 @@ class TestStringMethods(unittest.TestCase):
 
     def test_read_only_query(self):
         redis_graph = Graph('read_only', self.r)
+	
         # Build a sample graph with 10 nodes.
-        redis_graph.query("UNWIND range(0,10) as val CREATE ({v: val})", read_only=False)
-        
-        redis_graph.query("MATCH (a), (b), (c), (d) RETURN *", read_only=True)
+        redis_graph.query("UNWIND range(0, 10) as val CREATE ({v: val})")
 
         try:
-            redis_graph.query("CREATE (p:person{name:'a',age:32, array:[0,1,2]})")
+            # Issue a write query, specifying read-only true, this call should fail.
+            redis_graph.query("CREATE (p:person {name:'a'})", read_only=True)
             assert(False)
         except Exception as e:
             # Expecting an error.
