@@ -207,6 +207,7 @@ class TestStringMethods(unittest.TestCase):
         
         redis_graph.delete()
 
+
     def test_query_timeout(self):
         redis_graph = Graph('timeout', self.r)
         # Build a sample graph with 1000 nodes.
@@ -227,6 +228,19 @@ class TestStringMethods(unittest.TestCase):
             assert("Timeout argument must be a positive integer" in e.args)
             # Expecting an error.
             pass
+
+
+    def test_read_only_query(self):
+        redis_graph = Graph('read_only', self.r)
+
+        try:
+            # Issue a write query, specifying read-only true, this call should fail.
+            redis_graph.query("CREATE (p:person {name:'a'})", read_only=True)
+            assert(False)
+        except Exception as e:
+            # Expecting an error.
+            pass
+
 
     def test_cache_sync(self):
         # This test verifies that client internal graph schema cache stays
