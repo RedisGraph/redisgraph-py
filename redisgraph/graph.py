@@ -156,7 +156,8 @@ class Graph(object):
         # construct query command
         # ask for compact result-set format
         # specify known graph version
-        command = [("GRAPH.QUERY","GRAPH.RO_QUERY")[read_only], self.name, query, "--compact", "version", self.version]
+        cmd = "GRAPH.RO_QUERY" if read_only else "GRAPH.QUERY"
+        command = [cmd, self.name, query, "--compact", "version", self.version]
 
         # include timeout is specified
         if timeout:
