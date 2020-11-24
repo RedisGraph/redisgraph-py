@@ -156,7 +156,8 @@ class Graph(object):
         # construct query command
         # ask for compact result-set format
         # specify known graph version
-        command = [("GRAPH.QUERY","GRAPH.RO_QUERY")[read_only], self.name, query, "--compact", "version", self.version]
+        cmd = "GRAPH.RO_QUERY" if read_only else "GRAPH.QUERY"
+        command = [cmd, self.name, query, "--compact", "version", self.version]
 
         # include timeout is specified
         if timeout:
@@ -178,7 +179,7 @@ class Graph(object):
             self.version = e.version
             self._refresh_schema()
             # re-issue query
-            return self.query(q, params, timeout)
+            return self.query(q, params, timeout, read_only)
 
     def _execution_plan_to_string(self, plan):
         return "\n".join(plan)
@@ -213,7 +214,7 @@ class Graph(object):
         return self.query(query)
 
     # Procedures.
-    def call_procedure(self, procedure, *args, **kwagrs):
+    def call_procedure(self, procedure, read_only=False, *args, **kwagrs):
         args = [quote_string(arg) for arg in args]
         q = 'CALL %s(%s)' % (procedure, ','.join(args))
 
@@ -221,13 +222,13 @@ class Graph(object):
         if y:
             q += ' YIELD %s' % ','.join(y)
 
-        return self.query(q)
+        return self.query(q, read_only=read_only)
 
     def labels(self):
-        return self.call_procedure("db.labels").result_set
+        return self.call_procedure("db.labels", read_only=True).result_set
 
     def relationshipTypes(self):
-        return self.call_procedure("db.relationshipTypes").result_set
+        return self.call_procedure("db.relationshipTypes", read_only=True).result_set
 
     def propertyKeys(self):
-        return self.call_procedure("db.propertyKeys").result_set
+        return self.call_procedure("db.propertyKeys", read_only=True).result_set
