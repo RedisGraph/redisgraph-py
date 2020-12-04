@@ -58,6 +58,12 @@ class Graph:
         for i, p in enumerate(props):
             self._properties[i] = p[0]
 
+    def refresh_metadata(self, version, labels, reltypes, properties):
+        self.version = version
+        self._labels = labels
+        self._relationshipTypes = reltypes
+        self._properties = properties
+
     def get_label(self, idx):
         try:
             label = self._labels[idx]
