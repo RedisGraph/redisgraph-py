@@ -1,2 +1,2 @@
 redis
-PTable
+prettytable
