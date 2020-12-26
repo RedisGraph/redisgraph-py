@@ -4,14 +4,14 @@ class Node(object):
     """
     A node within the garph.
     """
-    def __init__(self, node_id=None, alias=None, label=None, properties={}):
+    def __init__(self, node_id=None, alias=None, label=None, properties=None):
         """
         Create a new node
         """
         self.id = node_id
         self.alias = alias
         self.label = label
-        self.properties = properties
+        self.properties = properties if properties is not None else {}
 
     def toString(self):
         res = ""
@@ -52,3 +52,4 @@ class Node(object):
             return False
 
         return True
+

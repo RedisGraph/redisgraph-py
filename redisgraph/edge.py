@@ -14,9 +14,9 @@ class Edge(object):
 
         self.id = edge_id
         self.relation = '' or relation
-        self.properties = {} or properties
         self.src_node = src_node
         self.dest_node = dest_node
+        self.properties = properties if properties is not None else {}
 
     def toString(self):
         res = ""
