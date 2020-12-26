@@ -12,7 +12,8 @@ class TestStringMethods(unittest.TestCase):
         
         john = Node(label='person', properties={'name': 'John Doe', 'age': 33, 'gender': 'male', 'status': 'single'})
         redis_graph.add_node(john)
-        japan = Node(label='country', properties={'name': 'Japan'})
+        japan = Node(label='country')
+        japan.properties['name'] = 'Japan'
         
         redis_graph.add_node(japan)
         edge = Edge(john, 'visited', japan, properties={'purpose': 'pleasure'})

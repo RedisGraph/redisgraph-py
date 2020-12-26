@@ -13,8 +13,8 @@ class Edge(object):
         assert src_node is not None and dest_node is not None
 
         self.id = edge_id
-        self.relation = '' or relation
-        self.properties = {} or properties
+        self.relation = relation or ''
+        self.properties = properties or {}
         self.src_node = src_node
         self.dest_node = dest_node
 
