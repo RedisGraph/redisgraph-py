@@ -1,7 +1,7 @@
 from .node import Node
 from .edge import Edge
 
-class Path(object):
+class Path:
 
     def __init__(self, nodes, edges):
         assert(isinstance(nodes, list) and isinstance(edges, list))
@@ -33,7 +33,7 @@ class Path(object):
 
     def edge_count(self):
         return len(self._edges)
-    
+
     def nodes_count(self):
         return len(self._nodes)
 
@@ -64,4 +64,3 @@ class Path(object):
         res += "(" + str(node_id) + ")"
         res += ">"
         return res
-    

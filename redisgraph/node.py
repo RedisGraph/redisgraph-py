@@ -1,6 +1,6 @@
 from .util import *
 
-class Node(object):
+class Node:
     """
     A node within the garph.
     """

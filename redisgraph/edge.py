@@ -2,7 +2,7 @@ from redisgraph import Node
 
 from .util import *
 
-class Edge(object):
+class Edge:
     """
     An edge connecting two nodes.
     """

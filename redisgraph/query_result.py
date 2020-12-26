@@ -20,13 +20,13 @@ STATS = [LABELS_ADDED, NODES_CREATED, PROPERTIES_SET, RELATIONSHIPS_CREATED,
         NODES_DELETED, RELATIONSHIPS_DELETED, INDICES_CREATED, INDICES_DELETED,
         CACHED_EXECUTION, INTERNAL_EXECUTION_TIME]
 
-class ResultSetColumnTypes(object):
+class ResultSetColumnTypes:
     COLUMN_UNKNOWN = 0
     COLUMN_SCALAR = 1
     COLUMN_NODE = 2       # Unused as of RedisGraph v2.1.0, retained for backwards compatibility.
     COLUMN_RELATION = 3   # Unused as of RedisGraph v2.1.0, retained for backwards compatibility.
 
-class ResultSetScalarTypes(object):
+class ResultSetScalarTypes:
     VALUE_UNKNOWN = 0
     VALUE_NULL = 1
     VALUE_STRING = 2
@@ -38,7 +38,7 @@ class ResultSetScalarTypes(object):
     VALUE_NODE = 8
     VALUE_PATH = 9
 
-class QueryResult(object):
+class QueryResult:
 
     def __init__(self, graph, response):
         self.graph = graph
