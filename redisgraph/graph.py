@@ -3,7 +3,7 @@ import redis
 from .query_result import QueryResult
 from .exceptions import VersionMismatchException
 
-class Graph(object):
+class Graph:
     """
     Graph, collection of nodes and edges.
     """
@@ -189,10 +189,10 @@ class Graph(object):
         Get the execution plan for given query,
         GRAPH.EXPLAIN returns an array of operations.
         """
-        
+
         if params is not None:
             query = self.build_params_header(params) + query
-        
+
         plan = self.redis_con.execute_command("GRAPH.EXPLAIN", self.name, query, query)
         return self._execution_plan_to_string(plan)
 
@@ -202,7 +202,7 @@ class Graph(object):
         """
         self._clear_schema()
         return self.redis_con.execute_command("GRAPH.DELETE", self.name)
-    
+
     def merge(self, pattern):
         """
         Merge pattern.

@@ -2,7 +2,7 @@ from redisgraph import Node
 
 from .util import *
 
-class Edge(object):
+class Edge:
     """
     An edge connecting two nodes.
     """
@@ -58,7 +58,7 @@ class Edge(object):
         # Source and destination nodes should match.
         if self.src_node != rhs.src_node:
             return False
-            
+
         if self.dest_node != rhs.dest_node:
             return False
 
