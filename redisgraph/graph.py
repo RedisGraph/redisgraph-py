@@ -105,19 +105,11 @@ class Graph:
         """
         Create entire graph.
         """
-        if len(self.nodes) == 0 and len(self.edges) == 0:
+        if not (self.nodes or self.edges):
             return None
 
-        query = 'CREATE '
-        for _, node in self.nodes.items():
-            query += str(node) + ','
-
-        query += ','.join([str(edge) for edge in self.edges])
-
-        # Discard leading comma.
-        if query[-1] == ',':
-            query = query[:-1]
-
+        query = f'CREATE '
+        query += ','.join(str(v) for v in [*self.nodes.values(), *self.edges])
         return self.query(query)
 
     def flush(self):
@@ -140,7 +132,7 @@ class Graph:
             # Value is None, replace with "null" string.
             elif value is None:
                 value = "null"
-            params_header += str(key) + "=" + str(value) + " "
+            params_header += f"{key} = {value} "
         return params_header
 
     def query(self, q, params=None, timeout=None, read_only=False):
@@ -152,7 +144,7 @@ class Graph:
         query = q
 
         # handle query parameters
-        if params is not None:
+        if params:
             query = self.build_params_header(params) + query
 
         # construct query command
@@ -174,7 +166,7 @@ class Graph:
         except redis.exceptions.ResponseError as e:
             if "wrong number of arguments" in str(e):
                 print ("Note: RedisGraph Python requires server version 2.2.8 or above")
-            raise e
+            raise
         except VersionMismatchException as e:
             # client view over the graph schema is out of sync
             # set client version and refresh local schema
@@ -208,22 +200,18 @@ class Graph:
         """
         Merge pattern.
         """
-
-        query = 'MERGE '
-        query += str(pattern)
-
-        return self.query(query)
+        return self.query(f'MERGE {pattern}')
 
     # Procedures.
     def call_procedure(self, procedure, read_only=False, *args, **kwagrs):
         args = [quote_string(arg) for arg in args]
-        q = 'CALL %s(%s)' % (procedure, ','.join(args))
+        query = f'CALL {procedure}({",".join(args)})'
 
-        y = kwagrs.get('y', None)
+        y = kwagrs.get('y')
         if y:
-            q += ' YIELD %s' % ','.join(y)
+            query += f' YIELD {",".join(y)}'
 
-        return self.query(q, read_only=read_only)
+        return self.query(query, read_only=read_only)
 
     def labels(self):
         return self.call_procedure("db.labels", read_only=True).result_set

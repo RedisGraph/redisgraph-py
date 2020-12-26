@@ -14,29 +14,22 @@ class Node:
         self.properties = properties
 
     def toString(self):
-        res = ""
+        res = ''
         if self.properties:
-            props = ','.join(key+':'+str(quote_string(val)) for key, val in sorted(self.properties.items()))
-            res += '{' + props + '}'
+            props = ','.join(
+                f'{key}:{quote_string(val)}'
+                for key, val in sorted(self.properties.items()))
+            res = f'{{{props}}}'
 
         return res
 
     def __str__(self):
-        res = '('
-        if self.alias:
-            res += self.alias
-        if self.label:
-            res += ':' + self.label
-        if self.properties:
-            props = ','.join(key+':'+str(quote_string(val)) for key, val in sorted(self.properties.items()))
-            res += '{' + props + '}'
-        res += ')'
-
-        return res
+        label = f':{self.label}' if label else ''
+        return f'({self.alias or ""}{label} {self.toString()})'
 
     def __eq__(self, rhs):
         # Quick positive check, if both IDs are set.
-        if self.id is not None and rhs.id is not None and self.id == rhs.id:
+        if self.id and self.id == rhs.id:
             return True
 
         # Label should match.
