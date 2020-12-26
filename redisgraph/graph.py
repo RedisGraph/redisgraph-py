@@ -93,11 +93,12 @@ class Graph:
 
     def add_edge(self, edge):
         """
-        Addes an edge to the graph.
+        Adds an edge to the graph.
         """
+        if not (self.nodes[edge.src_node.alias]
+                and self.nodes[edge.dest_node.alias]):
+            raise AssertionError("Both edge's end must be in the graph")
 
-        # Make sure edge both ends are in the graph
-        assert self.nodes[edge.src_node.alias] is not None and self.nodes[edge.dest_node.alias] is not None
         self.edges.append(edge)
 
     def commit(self):
@@ -128,12 +129,13 @@ class Graph:
         self.edges = []
 
     def build_params_header(self, params):
-        assert type(params) == dict
+        if not isinstance(params, dict):
+            raise TypeError("'params' must be a dict")
         # Header starts with "CYPHER"
         params_header = "CYPHER "
         for key, value in params.items():
             # If value is string add quotation marks.
-            if type(value) == str:
+            if isinstance(value, str):
                 value = quote_string(value)
             # Value is None, replace with "null" string.
             elif value is None:
@@ -189,7 +191,6 @@ class Graph:
         Get the execution plan for given query,
         GRAPH.EXPLAIN returns an array of operations.
         """
-
         if params is not None:
             query = self.build_params_header(params) + query
 

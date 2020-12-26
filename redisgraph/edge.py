@@ -10,11 +10,14 @@ class Edge:
         """
         Create a new edge.
         """
-        assert src_node is not None and dest_node is not None
+        if not (src_node and dest_node):
+            # NOTE(bors-42): It makes sense to change AssertionError to
+            #                ValueError here
+            raise AssertionError("Both src_node & dest_node must be provided")
 
         self.id = edge_id
-        self.relation = '' or relation
-        self.properties = {} or properties
+        self.relation = relation or ''
+        self.properties = properties or {}
         self.src_node = src_node
         self.dest_node = dest_node
 
