@@ -1,8 +1,8 @@
 from .node import Node
 from .edge import Edge
 
-class Path:
 
+class Path:
     def __init__(self, nodes, edges):
         assert(isinstance(nodes, list) and isinstance(edges, list))
         self._nodes = nodes

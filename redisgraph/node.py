@@ -1,4 +1,5 @@
-from .util import *
+from .util import quote_string
+
 
 class Node:
     """

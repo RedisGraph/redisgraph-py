@@ -1,7 +1,9 @@
-from .util import *
 import redis
-from .query_result import QueryResult
-from .exceptions import VersionMismatchException
+
+from redisgraph.util import random_string, quote_string
+from redisgraph.query_result import QueryResult
+from redisgraph.exceptions import VersionMismatchException
+
 
 class Graph:
     """
@@ -173,7 +175,7 @@ class Graph:
             return QueryResult(self, response)
         except redis.exceptions.ResponseError as e:
             if "wrong number of arguments" in str(e):
-                print ("Note: RedisGraph Python requires server version 2.2.8 or above")
+                print("Note: RedisGraph Python requires server version 2.2.8 or above")
             raise e
         except VersionMismatchException as e:
             # client view over the graph schema is out of sync
