@@ -1,10 +1,15 @@
-import redis
 import unittest
+from tests.utils import base
+
+import redis
+
 from redisgraph import Node, Edge, Graph, Path
 
 
-class TestStringMethods(unittest.TestCase):
+class TestStringMethods(base.TestCase):
+
     def setUp(self):
+        super().setUp()
         self.r = redis.Redis(host='localhost', port=6379, decode_responses=True)
 
     def test_graph_creation(self):

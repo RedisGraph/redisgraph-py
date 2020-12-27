@@ -4,7 +4,9 @@ from .edge import Edge
 
 class Path:
     def __init__(self, nodes, edges):
-        assert(isinstance(nodes, list) and isinstance(edges, list))
+        if not (isinstance(nodes, list) and isinstance(edges, list)):
+            raise TypeError("nodes and edges must be list")
+
         self._nodes = nodes
         self._edges = edges
         self.append_type = Node
@@ -38,13 +40,15 @@ class Path:
         return len(self._nodes)
 
     def add_node(self, node):
-        assert(type(node) == self.append_type)
+        if not isinstance(node, self.append_type):
+            raise AssertionError("Add Edge before adding Node")
         self._nodes.append(node)
         self.append_type = Edge
         return self
 
     def add_edge(self, edge):
-        assert(type(edge) == self.append_type)
+        if not isinstance(edge, self.append_type):
+            raise AssertionError("Add Node before adding Edge")
         self._edges.append(edge)
         self.append_type = Node
         return self

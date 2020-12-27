@@ -56,7 +56,7 @@ jobs:
           name: run tests
           command: |
             . venv/bin/activate
-            coverage run tests/functional/test.py
+            coverage run tests/functional/test_all.py
 
       - early_return_for_forked_pull_requests
 
