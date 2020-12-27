@@ -20,7 +20,7 @@ jobs:
   build:
     docker:
       - image: circleci/python:3.6.1
-      
+
       - image: redislabs/redisgraph:edge
 
     working_directory: ~/repo
@@ -56,7 +56,7 @@ jobs:
           name: run tests
           command: |
             . venv/bin/activate
-            coverage run test.py
+            coverage run tests/functional/test.py
 
       - early_return_for_forked_pull_requests
 
@@ -69,7 +69,7 @@ jobs:
    #   - store_artifacts:
    #       path: test-reports
    #       destination: test-reports
-  
+
 workflows:
   version: 2
   commit:
@@ -84,4 +84,4 @@ workflows:
               only:
                 - master
     jobs:
-      - build  
+      - build
