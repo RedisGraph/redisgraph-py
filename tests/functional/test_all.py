@@ -49,7 +49,7 @@ class TestStringMethods(base.TestCase):
     def test_array_functions(self):
         redis_graph = Graph('social', self.r)
 
-        query = """CREATE (p:person{name:'a',age:32, array:[0,1,2]})"""
+        query = """CREATE (p:person{name:'a', age:32, array:[0,1,2]})"""
         redis_graph.query(query)
 
         query = """WITH [0,1,2] as x return x"""
@@ -163,7 +163,6 @@ class TestStringMethods(base.TestCase):
         # Build a graph of form (a)-[R]->(b)
         node0 = Node(node_id=0, label="L1", properties={'value': 'a'})
         node1 = Node(node_id=1, label="L1", properties={'value': 'b'})
-
         edge01 = Edge(node0, "R", node1, edge_id=0)
 
         redis_graph.add_node(node0)
@@ -232,6 +231,8 @@ class TestStringMethods(base.TestCase):
             assert("Timeout argument must be a positive integer" in e.args)
             # Expecting an error.
             pass
+
+        redis_graph.delete()
 
     def test_read_only_query(self):
         redis_graph = Graph('read_only', self.r)
@@ -312,6 +313,8 @@ class TestStringMethods(base.TestCase):
         assert(A._properties[1] == 'x')
         assert(A._relationshipTypes[0] == 'S')
         assert(A._relationshipTypes[1] == 'R')
+
+        A.delete()
 
 
 if __name__ == '__main__':

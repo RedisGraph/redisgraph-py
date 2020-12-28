@@ -12,7 +12,7 @@ class Edge:
         """
         Create a new edge.
         """
-        if not (src_node and dest_node):
+        if (src_node is None or dest_node is None):
             # NOTE(bors-42): It makes sense to change AssertionError to
             #                ValueError here
             raise AssertionError("Both src_node & dest_node must be provided")
