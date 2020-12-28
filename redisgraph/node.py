@@ -1,4 +1,5 @@
-from .util import *
+from .util import quote_string
+
 
 class Node:
     """
@@ -36,8 +37,8 @@ class Node:
 
     def __eq__(self, rhs):
         # Quick positive check, if both IDs are set.
-        if self.id is not None and rhs.id is not None and self.id == rhs.id:
-            return True
+        if self.id is not None and rhs.id is not None and self.id != rhs.id:
+            return False
 
         # Label should match.
         if self.label != rhs.label:

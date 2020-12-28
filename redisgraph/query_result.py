@@ -17,14 +17,16 @@ CACHED_EXECUTION = "Cached execution"
 INTERNAL_EXECUTION_TIME = 'internal execution time'
 
 STATS = [LABELS_ADDED, NODES_CREATED, PROPERTIES_SET, RELATIONSHIPS_CREATED,
-        NODES_DELETED, RELATIONSHIPS_DELETED, INDICES_CREATED, INDICES_DELETED,
-        CACHED_EXECUTION, INTERNAL_EXECUTION_TIME]
+         NODES_DELETED, RELATIONSHIPS_DELETED, INDICES_CREATED, INDICES_DELETED,
+         CACHED_EXECUTION, INTERNAL_EXECUTION_TIME]
+
 
 class ResultSetColumnTypes:
     COLUMN_UNKNOWN = 0
     COLUMN_SCALAR = 1
     COLUMN_NODE = 2       # Unused as of RedisGraph v2.1.0, retained for backwards compatibility.
     COLUMN_RELATION = 3   # Unused as of RedisGraph v2.1.0, retained for backwards compatibility.
+
 
 class ResultSetScalarTypes:
     VALUE_UNKNOWN = 0
@@ -37,6 +39,7 @@ class ResultSetScalarTypes:
     VALUE_EDGE = 7
     VALUE_NODE = 8
     VALUE_PATH = 9
+
 
 class QueryResult:
 
@@ -288,4 +291,3 @@ class QueryResult:
     @property
     def run_time_ms(self):
         return self._get_stat(INTERNAL_EXECUTION_TIME)
-

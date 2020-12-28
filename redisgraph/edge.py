@@ -1,12 +1,14 @@
 from redisgraph import Node
 
-from .util import *
+from .util import quote_string
+
 
 class Edge:
     """
     An edge connecting two nodes.
     """
-    def __init__(self, src_node, relation, dest_node, edge_id=None, properties=None):
+    def __init__(self, src_node, relation, dest_node, edge_id=None,
+                 properties=None):
         """
         Create a new edge.
         """
