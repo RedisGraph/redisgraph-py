@@ -17,7 +17,7 @@ commands:
               circleci step halt
             fi
 jobs:
-  test:
+  build:
     docker:
       - image: circleci/python:3.6.1
 
@@ -30,7 +30,7 @@ jobs:
 
       - run:
           name: Install tox
-          command: pip install tox
+          command: sudo pip install tox
 
       - run:
           name: Test package build
@@ -62,7 +62,7 @@ workflows:
   version: 2
   commit:
     jobs:
-      - test
+      - build
   nightly:
     triggers:
       - schedule:
@@ -72,4 +72,4 @@ workflows:
               only:
                 - master
     jobs:
-      - test
+      - build
