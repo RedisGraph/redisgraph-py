@@ -6,3 +6,5 @@ pytest-html
 
 testtools>=1.4.0
 mock
+
+codecov
