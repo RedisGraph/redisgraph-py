@@ -39,6 +39,7 @@ class ResultSetScalarTypes:
     VALUE_EDGE = 7
     VALUE_NODE = 8
     VALUE_PATH = 9
+    VALUE_MAP = 10
 
 
 class QueryResult:
@@ -125,6 +126,14 @@ class QueryResult:
 
         return properties
 
+    def parse_string(self, cell):
+        if isinstance(cell, bytes):
+            return cell.decode()
+        elif not isinstance(cell, str):
+            return str(cell)
+        else:
+            return cell
+
     def parse_node(self, cell):
         # Node ID (integer),
         # [label string offset (integer)],
@@ -156,6 +165,21 @@ class QueryResult:
         edges = self.parse_scalar(cell[1])
         return Path(nodes, edges)
 
+    def parse_map(self, cell):
+        m = {}
+        n_entries = len(cell)
+
+        # an entry in a map is composed of 3 elements:
+        # 1. key (string)
+        # 2. value type
+        # 3. value
+        for i in range(0, n_entries, 3):
+            key = self.parse_string(cell[i])
+            val = [cell[i+1], cell[i+2]]
+            m[key] = self.parse_scalar(val)
+
+        return m
+
     def parse_scalar(self, cell):
         scalar_type = int(cell[0])
         value = cell[1]
@@ -165,12 +189,7 @@ class QueryResult:
             scalar = None
 
         elif scalar_type == ResultSetScalarTypes.VALUE_STRING:
-            if isinstance(value, bytes):
-                scalar = value.decode()
-            elif not isinstance(value, str):
-                scalar = str(value)
-            else:
-                scalar = value
+            scalar = self.parse_string(value)
 
         elif scalar_type == ResultSetScalarTypes.VALUE_INTEGER:
             scalar = int(value)
@@ -201,6 +220,9 @@ class QueryResult:
 
         elif scalar_type == ResultSetScalarTypes.VALUE_PATH:
             scalar = self.parse_path(value)
+
+        elif scalar_type == ResultSetScalarTypes.VALUE_MAP:
+            scalar = self.parse_map(value)
 
         elif scalar_type == ResultSetScalarTypes.VALUE_UNKNOWN:
             print("Unknown scalar type\n")

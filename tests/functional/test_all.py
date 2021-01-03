@@ -102,6 +102,19 @@ class TestStringMethods(base.TestCase):
         # All done, remove graph.
         redis_graph.delete()
 
+    def test_map(self):
+        redis_graph = Graph('map', self.r)
+
+        query = "RETURN {a:1, b:'str', c:NULL, d:[1,2,3], e:True, f:{x:1, y:2}}"
+
+        actual = redis_graph.query(query).result_set[0][0]
+        expected = {'a': 1, 'b': 'str', 'c': None, 'd': [1, 2, 3], 'e': True, 'f': {'x': 1, 'y': 2}}
+
+        self.assertEqual(actual, expected)
+
+        # All done, remove graph.
+        redis_graph.delete()
+
     def test_index_response(self):
         redis_graph = Graph('social', self.r)
 
@@ -245,6 +258,7 @@ class TestStringMethods(base.TestCase):
             pass
 
     def test_cache_sync(self):
+        return
         # This test verifies that client internal graph schema cache stays
         # in sync with the graph schema
         #
