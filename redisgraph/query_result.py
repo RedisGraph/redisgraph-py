@@ -4,6 +4,7 @@ from .path import Path
 from .exceptions import VersionMismatchException
 from prettytable import PrettyTable
 from redis import ResponseError
+from collections import OrderedDict
 
 LABELS_ADDED = 'Labels added'
 NODES_CREATED = 'Nodes created'
@@ -166,7 +167,7 @@ class QueryResult:
         return Path(nodes, edges)
 
     def parse_map(self, cell):
-        m = {}
+        m = OrderedDict()
         n_entries = len(cell)
 
         # an entry in a map is composed of 3 elements:
