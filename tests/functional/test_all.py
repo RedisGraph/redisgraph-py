@@ -258,6 +258,7 @@ class TestStringMethods(base.TestCase):
             pass
 
     def test_cache_sync(self):
+        pass
         return
         # This test verifies that client internal graph schema cache stays
         # in sync with the graph schema
