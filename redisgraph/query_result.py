@@ -170,13 +170,12 @@ class QueryResult:
         m = OrderedDict()
         n_entries = len(cell)
 
-        # A map is an array of entries.
-        # Each entry is an array composed of 2 elements:
+        # A map is an array of key value pairs.
         # 1. key (string)
         # 2. array: (value type, value)
-        for i in range(0, n_entries):
-            key = self.parse_string(cell[i][0])
-            m[key] = self.parse_scalar(cell[i][1])
+        for i in range(0, n_entries, 2):
+            key = self.parse_string(cell[i])
+            m[key] = self.parse_scalar(cell[i+1])
 
         return m
 
