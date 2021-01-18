@@ -218,7 +218,7 @@ class Graph:
         return self.query(query)
 
     # Procedures.
-    def call_procedure(self, procedure, read_only=False, *args, **kwagrs):
+    def call_procedure(self, procedure, *args, read_only=False, **kwagrs):
         args = [quote_string(arg) for arg in args]
         q = 'CALL %s(%s)' % (procedure, ','.join(args))
 
