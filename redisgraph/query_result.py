@@ -98,30 +98,17 @@ class QueryResult:
 
     def parse_metadata(self, raw_metadata):
         # Decode metadata:
-        # [
-        #   ["version", VERSION],
-        #   ["labels", [[VALUE_STRING, "label_1"] ... ]],
-        #   ["relationship types ", [[VALUE_STRING, "reltype_1"] ... ]],
-        #   ["property keys", [[VALUE_STRING, "prop_1"] ... ]]
-        # ]
-        version = raw_metadata[0][1]
-        raw_labels = raw_metadata[1][1]
-        raw_reltypes = raw_metadata[2][1]
-        raw_props = raw_metadata[3][1]
-
-        # Arrays to be passed into the internal graph structure.
-        labels = [None] * len(raw_labels)
-        reltypes = [None] * len(raw_reltypes)
-        properties = [None] * len(raw_props)
-
-        for idx, label in enumerate(raw_labels):
-            labels[idx] = self.parse_scalar(label)
-
-        for idx, reltype in enumerate(raw_reltypes):
-            reltypes[idx] = self.parse_scalar(reltype)
-
-        for idx, prop in enumerate(raw_props):
-            properties[idx] = self.parse_scalar(prop)
+        # {
+        #   "version", VERSION,
+        #   "labels", [[VALUE_STRING, "label_1"] ... ],
+        #   "relationship types ", [[VALUE_STRING, "reltype_1"] ... ],
+        #   "property keys", [[VALUE_STRING, "prop_1"] ... ]
+        # }
+        metadata = self.parse_map(raw_metadata)
+        version = metadata["version"]
+        labels = metadata["labels"]
+        reltypes = metadata["relationship types"]
+        properties = metadata["property keys"]
 
         # Update the graph's internal metadata.
         self.graph.refresh_metadata(version, labels, reltypes, properties)
