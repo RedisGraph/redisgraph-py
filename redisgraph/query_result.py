@@ -183,9 +183,9 @@ class QueryResult:
     def parse_point(self, cell):
         p = {}
         # A point is received an array of the form: [latitude, longitude]
-        # It is returned as a map of the form: {"x": latitude, "y": longitude}
-        p["x"] = float(cell[0])
-        p["y"] = float(cell[1])
+        # It is returned as a map of the form: {"latitude": latitude, "longitude": longitude}
+        p["latitude"] = float(cell[0])
+        p["longitude"] = float(cell[1])
         return p
 
     def parse_scalar(self, cell):

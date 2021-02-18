@@ -115,6 +115,26 @@ class TestStringMethods(base.TestCase):
         # All done, remove graph.
         redis_graph.delete()
 
+    def test_point(self):
+        redis_graph = Graph('map', self.r)
+
+        query = "RETURN point({latitude: 32.070794860, longitude: 34.820751118})"
+        expected_lat = 32.070794860
+        expected_lon = 34.820751118
+        actual = redis_graph.query(query).result_set[0][0]
+        self.assertTrue(abs(actual['latitude'] - expected_lat) < 0.001)
+        self.assertTrue(abs(actual['longitude'] - expected_lon) < 0.001)
+
+        query = "RETURN point({latitude: 32, longitude: 34.0})"
+        expected_lat = 32
+        expected_lon = 34
+        actual = redis_graph.query(query).result_set[0][0]
+        self.assertTrue(abs(actual['latitude'] - expected_lat) < 0.001)
+        self.assertTrue(abs(actual['longitude'] - expected_lon) < 0.001)
+
+        # All done, remove graph.
+        redis_graph.delete()
+
     def test_index_response(self):
         redis_graph = Graph('social', self.r)
 
