@@ -20,7 +20,7 @@ jobs:
   build:
     docker:
       - image: circleci/python:3.6.1
-      
+
       - image: redislabs/redisgraph:edge
 
     working_directory: ~/repo
@@ -28,48 +28,36 @@ jobs:
     steps:
       - checkout
 
-      # Download and cache dependencies
-      - restore_cache:
-          keys:
-          - v1-dependencies-{{ checksum "requirements.txt" }}
-          # fallback to using the latest cache if no exact match is found
-          - v1-dependencies-
+      - run:
+          name: Install tox
+          command: sudo pip install tox
 
       - run:
-          name: install dependencies
-          command: |
-            python -m venv venv
-            . venv/bin/activate
-            pip install -r requirements.txt
-            pip install codecov
-
-      - save_cache:
-          paths:
-            - ./venv
-          key: v1-dependencies-{{ checksum "requirements.txt" }}
+          name: Test package build
+          command: tox -e sdist
 
       - run:
-          name: test dist
-          command: python setup.py sdist
+          name: Run code styles
+          command: tox -e pep8
 
       - run:
-          name: run tests
-          command: |
-            . venv/bin/activate
-            coverage run test.py
+          name: Run unittest with coverage
+          command: tox -e cover
+
+      - run:
+          name: Run functional tests
+          command: tox -e func
 
       - early_return_for_forked_pull_requests
 
       - run:
           name: codecove
           command: |
-            . venv/bin/activate
-            codecov
+            . .tox/func/bin/activate
+            codecov --file .tox/cover/report/coverage.xml --name ${CODECOV_NAME}-unittests
+            codecov --file .tox/func/report/coverage.xml --name ${CODECOV_NAME}-functional
 
-   #   - store_artifacts:
-   #       path: test-reports
-   #       destination: test-reports
-  
+
 workflows:
   version: 2
   commit:
@@ -84,4 +72,4 @@ workflows:
               only:
                 - master
     jobs:
-      - build  
+      - build

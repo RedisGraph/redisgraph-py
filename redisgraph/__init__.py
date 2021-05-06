@@ -1,4 +1,4 @@
-from .node import Node
-from .edge import Edge
-from .graph import Graph
-from .path import Path
+from .node import Node     # noqa
+from .edge import Edge     # noqa
+from .graph import Graph   # noqa
+from .path import Path     # noqa
