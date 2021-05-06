@@ -57,14 +57,15 @@ class Path:
         return self.nodes() == other.nodes() and self.edges() == other.edges()
 
     def __str__(self):
-        res = "<"
+        res = ""
         edge_count = self.edge_count()
-        for i in range(0, edge_count):
+        for i in range(edge_count):
             node_id = self.get_node(i).id
-            res += "(" + str(node_id) + ")"
+            res += f"({node_id})"
             edge = self.get_relationship(i)
-            res += "-[" + str(int(edge.id)) + "]->" if edge.src_node == node_id else "<-[" + str(int(edge.id)) + "]-"
-        node_id = self.get_node(edge_count).id
-        res += "(" + str(node_id) + ")"
-        res += ">"
-        return res
+            if edge.src_node == node_id:
+                res = f"{res}-[{edge.id}]->"
+            else:
+                res = f"{res}<-[{edge.id}]-"
+
+        return f'<{res}({self.get_node(edge_count).id})>'

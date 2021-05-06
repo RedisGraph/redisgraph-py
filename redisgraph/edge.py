@@ -24,40 +24,31 @@ class Edge:
         self.dest_node = dest_node
 
     def toString(self):
-        res = ""
+        res = ''
         if self.properties:
-            props = ','.join(key+':'+str(quote_string(val)) for key, val in sorted(self.properties.items()))
-            res += '{' + props + '}'
+            props = ','.join(
+                f'{key}:{quote_string(val)}'
+                for key, val in sorted(self.properties.items()))
+            res = f'{{{props}}}'
 
         return res
 
     def __str__(self):
         # Source node.
-        if isinstance(self.src_node, Node):
-            res = str(self.src_node)
-        else:
-            res = '()'
+        res = str(self.src_node) if isinstance(self.src_node, Node) else '()'
 
         # Edge
-        res += "-["
-        if self.relation:
-            res += ":" + self.relation
-        if self.properties:
-            props = ','.join(key+':'+str(quote_string(val)) for key, val in sorted(self.properties.items()))
-            res += '{' + props + '}'
-        res += ']->'
+        edge_relation = f':{self.relation}' if self.relation else ''
+        res += f'-[{edge_relation} {self.toString()}]->'
 
         # Dest node.
-        if isinstance(self.dest_node, Node):
-            res += str(self.dest_node)
-        else:
-            res += '()'
+        res += f"{self.dest_node if isinstance(self.dest_node, Node) else ''}"
 
         return res
 
     def __eq__(self, rhs):
         # Quick positive check, if both IDs are set.
-        if self.id is not None and rhs.id is not None and self.id == rhs.id:
+        if self.id and self.id == rhs.id:
             return True
 
         # Source and destination nodes should match.
