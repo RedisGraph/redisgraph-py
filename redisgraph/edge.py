@@ -1,16 +1,21 @@
 from redisgraph import Node
 
-from .util import *
+from .util import quote_string
 
-class Edge(object):
+
+class Edge:
     """
     An edge connecting two nodes.
     """
-    def __init__(self, src_node, relation, dest_node, edge_id=None, properties=None):
+    def __init__(self, src_node, relation, dest_node, edge_id=None,
+                 properties=None):
         """
         Create a new edge.
         """
-        assert src_node is not None and dest_node is not None
+        if (src_node is None or dest_node is None):
+            # NOTE(bors-42): It makes sense to change AssertionError to
+            #                ValueError here
+            raise AssertionError("Both src_node & dest_node must be provided")
 
         self.id = edge_id
         self.relation = relation or ''
@@ -58,7 +63,7 @@ class Edge(object):
         # Source and destination nodes should match.
         if self.src_node != rhs.src_node:
             return False
-            
+
         if self.dest_node != rhs.dest_node:
             return False
 

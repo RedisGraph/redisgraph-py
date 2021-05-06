@@ -1,6 +1,7 @@
-from .util import *
+from .util import quote_string
 
-class Node(object):
+
+class Node:
     """
     A node within the garph.
     """
@@ -11,7 +12,7 @@ class Node(object):
         self.id = node_id
         self.alias = alias
         self.label = label
-        self.properties = properties or {} 
+        self.properties = properties or {}
 
     def toString(self):
         res = ""
@@ -36,8 +37,8 @@ class Node(object):
 
     def __eq__(self, rhs):
         # Quick positive check, if both IDs are set.
-        if self.id is not None and rhs.id is not None and self.id == rhs.id:
-            return True
+        if self.id is not None and rhs.id is not None and self.id != rhs.id:
+            return False
 
         # Label should match.
         if self.label != rhs.label:

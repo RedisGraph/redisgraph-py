@@ -1,0 +1,10 @@
+flake8
+
+pytest
+pytest-cov
+pytest-html
+
+testtools>=1.4.0
+mock
+
+codecov
