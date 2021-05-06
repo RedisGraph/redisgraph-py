@@ -41,6 +41,7 @@ class ResultSetScalarTypes:
     VALUE_NODE = 8
     VALUE_PATH = 9
     VALUE_MAP = 10
+    VALUE_POINT = 11
 
 
 class QueryResult:
@@ -198,6 +199,14 @@ class QueryResult:
 
         return m
 
+    def parse_point(self, cell):
+        p = {}
+        # A point is received an array of the form: [latitude, longitude]
+        # It is returned as a map of the form: {"latitude": latitude, "longitude": longitude}
+        p["latitude"] = float(cell[0])
+        p["longitude"] = float(cell[1])
+        return p
+
     def parse_scalar(self, cell):
         scalar_type = int(cell[0])
         value = cell[1]
@@ -241,6 +250,9 @@ class QueryResult:
 
         elif scalar_type == ResultSetScalarTypes.VALUE_MAP:
             scalar = self.parse_map(value)
+
+        elif scalar_type == ResultSetScalarTypes.VALUE_POINT:
+            scalar = self.parse_point(value)
 
         elif scalar_type == ResultSetScalarTypes.VALUE_UNKNOWN:
             print("Unknown scalar type\n")
