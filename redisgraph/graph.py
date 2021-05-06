@@ -1,7 +1,9 @@
-from .util import *
 import redis
-from .query_result import QueryResult
-from .exceptions import VersionMismatchException
+
+from redisgraph.util import random_string, quote_string
+from redisgraph.query_result import QueryResult
+from redisgraph.exceptions import VersionMismatchException
+
 
 class Graph:
     """
@@ -151,7 +153,8 @@ class Graph:
         # ask for compact result-set format
         # specify known graph version
         cmd = "GRAPH.RO_QUERY" if read_only else "GRAPH.QUERY"
-        command = [cmd, self.name, query, "--compact", "version", self.version]
+        # command = [cmd, self.name, query, "--compact", "version", self.version]
+        command = [cmd, self.name, query, "--compact"]
 
         # include timeout is specified
         if timeout:
@@ -203,7 +206,7 @@ class Graph:
         return self.query(f'MERGE {pattern}')
 
     # Procedures.
-    def call_procedure(self, procedure, read_only=False, *args, **kwagrs):
+    def call_procedure(self, procedure, *args, read_only=False, **kwagrs):
         args = [quote_string(arg) for arg in args]
         query = f'CALL {procedure}({",".join(args)})'
 

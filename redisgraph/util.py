@@ -25,6 +25,8 @@ def quote_string(v):
     if len(v) == 0:
         return '""'
 
+    v = v.replace('"', '\\"')
+
     if v[0] != '"':
         v = '"' + v
 
