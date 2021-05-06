@@ -177,6 +177,11 @@ class Graph:
         except redis.exceptions.ResponseError as e:
             if "wrong number of arguments" in str(e):
                 print("Note: RedisGraph Python requires server version 2.2.8 or above")
+            if "unknown command" in str(e):
+                # `GRAPH.RO_QUERY` is unavailable in older versions.
+                command[0] = "GRAPH.QUERY"
+                response = self.redis_con.execute_command(*command)
+                return QueryResult(self, response)
             raise e
         except VersionMismatchException as e:
             # client view over the graph schema is out of sync
