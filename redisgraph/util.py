@@ -27,10 +27,4 @@ def quote_string(v):
 
     v = v.replace('"', '\\"')
 
-    if v[0] != '"':
-        v = '"' + v
-
-    if v[-1] != '"':
-        v = v + '"'
-
-    return v
+    return '"{}"'.format(v)
