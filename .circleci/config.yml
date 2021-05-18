@@ -1,9 +1,27 @@
-# Python CircleCI 2.0 configuration file
-#
-# Check https://circleci.com/docs/2.0/language-python/ for more details
-#
 version: 2.1
 commands:
+
+  abort_for_docs:
+    steps:
+      - run:
+          name: Avoid tests for docs
+          command: |
+            if [[ $CIRCLE_BRANCH == *docs ]]; then
+              echo "Identifies as documents PR, no testing required"
+              circleci step halt
+            fi
+
+  abort_for_noci:
+    steps:
+      - run:
+          name: Ignore CI for specific branches
+          command: |
+            if [[ $CIRCLE_BRANCH == *noci ]]; then
+              echo "Identifies as actively ignoring CI, no testing required."
+              circleci step halt
+            fi
+
+
   early_return_for_forked_pull_requests:
     description: >-
       If this build is from a fork, stop executing the current job and return success.
@@ -12,33 +30,31 @@ commands:
       - run:
           name: Early return if this build is from a forked PR
           command: |
-            if [ -n "$CIRCLE_PR_NUMBER" ]; then
+            if [[ -n "$CIRCLE_PR_NUMBER" ]]; then
               echo "Nothing to do for forked PRs, so marking this step successful"
               circleci step halt
             fi
-jobs:
-  build:
-    docker:
-      - image: circleci/python:3.6.1
 
-      - image: redislabs/redisgraph:edge
-
-    working_directory: ~/repo
-
+  build_and_test:
     steps:
+      - abort_for_docs
+      - abort_for_noci
       - checkout
+      - run:
+          name: install tox dependencies
+          command: |
+            pip install --user --quiet -r requirements.txt
 
       - run:
-          name: Install tox
-          command: sudo pip install tox
+          name: build
+          command: |
+            poetry build --format sdist
+            poetry build --format wheel
 
       - run:
-          name: Test package build
-          command: tox -e sdist
-
-      - run:
-          name: Run code styles
-          command: tox -e pep8
+          name: lint
+          command: |
+            tox -e linters
 
       - run:
           name: Run unittest with coverage
@@ -49,7 +65,6 @@ jobs:
           command: tox -e func
 
       - early_return_for_forked_pull_requests
-
       - run:
           name: codecove
           command: |
@@ -57,19 +72,53 @@ jobs:
             codecov --file .tox/cover/report/coverage.xml --name ${CODECOV_NAME}-unittests
             codecov --file .tox/func/report/coverage.xml --name ${CODECOV_NAME}-functional
 
+jobs:
+  build:
+    parameters:
+      python_version:
+        type: string
+    docker:
+      - image: circleci/python:<<parameters.python_version>>
+      - image: redislabs/redisgraph:edge
+
+    working_directory: ~/repo
+
+    steps:
+      - build_and_test
+
+on-any-branch: &on-any-branch
+  filters:
+    branches:
+      only:
+        - /.*/
+    tags:
+      ignore: /.*/
+
+python-versions: &python-versions
+  matrix:
+    parameters:
+      python_version:
+        - "3.6.9"
+        - "3.7.9"
+        - "3.8.9"
+        - "3.9.4"
+
 
 workflows:
   version: 2
   commit:
     jobs:
-      - build
-  nightly:
-    triggers:
-      - schedule:
-          cron: "0 0 * * *"
-          filters:
-            branches:
-              only:
-                - master
-    jobs:
-      - build
+      - build:
+         <<: *on-any-branch
+         <<: *python-versions
+
+#  nightly:
+#    triggers:
+#      - schedule:
+#          cron: "0 0 * * *"
+#          filters:
+#            branches:
+#              only:
+#                - master
+#    jobs:
+#      - build

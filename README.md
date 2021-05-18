@@ -3,7 +3,7 @@
 [![PyPI version](https://badge.fury.io/py/redisgraph.svg)](https://badge.fury.io/py/redisgraph)
 [![GitHub issues](https://img.shields.io/github/release/RedisGraph/redisgraph-py.svg)](https://github.com/RedisGraph/redisgraph-py/releases/latest)
 [![Codecov](https://codecov.io/gh/RedisGraph/redisgraph-py/branch/master/graph/badge.svg)](https://codecov.io/gh/RedisGraph/redisgraph-py)
-[![Known Vulnerabilities](https://snyk.io/test/github/RedisGraph/redisgraph-py/badge.svg?targetFile=requirements.txt)](https://snyk.io/test/github/RedisGraph/redisgraph-py?targetFile=requirements.txt)
+[![Known Vulnerabilities](https://snyk.io/test/github/RedisGraph/redisgraph-py/badge.svg?targetFile=pyproject.toml)](https://snyk.io/test/github/RedisGraph/redisgraph-py?targetFile=pyproject.toml)
 [![Total alerts](https://img.shields.io/lgtm/alerts/g/RedisGraph/redisgraph-py.svg?logo=lgtm&logoWidth=18)](https://lgtm.com/projects/g/RedisGraph/redisgraph-py/alerts/)
 
 # redisgraph-py
@@ -91,7 +91,13 @@ pip install git+https://github.com/RedisGraph/redisgraph-py.git@master
 
 ### Install for development in env
 
-```
-tox -e env
-source ./tox/env/bin/activate
-```
+1. Create a virtualenv to manage your python dependencies, and ensure it's active.
+   ```virtualenv -v venv; source venv/bin/activate```
+
+2. Install [pypoetry](https://python-poetry.org/) to manage your dependencies.
+   ```pip install poetry```
+
+3. Install dependencies.
+   ```poetry install```
+
+[tox](https://tox.readthedocs.io/en/latest/) runs all code linters as its default target.
