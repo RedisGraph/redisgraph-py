@@ -72,6 +72,22 @@ commands:
             codecov --file .tox/cover/report/coverage.xml --name ${CODECOV_NAME}-unittests
             codecov --file .tox/func/report/coverage.xml --name ${CODECOV_NAME}-functional
 
+  docker:
+    parameters:
+      docker_version:
+        type: string
+        default: "edge"
+    steps:
+      - setup_remote_docker
+      - run:
+          name: dockers
+          description: Build and release docker
+          command: |
+            bash <(curl -fsSL https://get.docker.com)
+            docker login -u redisfab -p $DOCKER_REDISFAB_PWD
+            docker build -t redisgraph:<<parameters.docker_version>> .
+            docker pusH
+
 jobs:
   build:
     parameters:
@@ -80,11 +96,22 @@ jobs:
     docker:
       - image: circleci/python:<<parameters.python_version>>
       - image: redislabs/redisgraph:edge
+    steps:
+      - build_and_test
 
-    working_directory: ~/repo
+  # since this is used by cron, we by default build against latest
+  build_and_edge:
+    parameters:
+      docker_version:
+        type: string
+        default: "edge"
+    docker:
+      - image: circleci/python:latest
+      - image: redislabs/redisgraph:edge
 
     steps:
       - build_and_test
+      - docker
 
 on-any-branch: &on-any-branch
   filters:
@@ -94,6 +121,13 @@ on-any-branch: &on-any-branch
     tags:
       ignore: /.*/
 
+on-master: &on-master
+  filters:
+    branches:
+      only:
+        - master
+
+# the is to build and test, per commit against all supported python versions
 python-versions: &python-versions
   matrix:
     parameters:
@@ -102,7 +136,7 @@ python-versions: &python-versions
         - "3.7.9"
         - "3.8.9"
         - "3.9.4"
-
+        - "latest"
 
 workflows:
   version: 2
@@ -112,13 +146,10 @@ workflows:
          <<: *on-any-branch
          <<: *python-versions
 
-#  nightly:
-#    triggers:
-#      - schedule:
-#          cron: "0 0 * * *"
-#          filters:
-#            branches:
-#              only:
-#                - master
-#    jobs:
-#      - build
+  nightly:
+    triggers:
+      - schedule:
+          cron: "0 0 * * *"
+          <<: *on-master
+    jobs:
+      - build_and_edge
