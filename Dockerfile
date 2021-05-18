@@ -13,5 +13,5 @@ FROM redislabs/redisgraph:edge as runner
 RUN apt update && apt install -y python3 python3-pip
 RUN rm -rf /var/cache/apt/
 
-COPY --from=builder /build/dist/redisgraph*.tar.gz /tmp
+COPY --from=builder /build/dist/redisgraph*.tar.gz /tmp/
 RUN pip3 install /tmp/redisgraph*.tar.gz

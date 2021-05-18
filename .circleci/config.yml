@@ -41,15 +41,20 @@ commands:
       - abort_for_noci
       - checkout
       - run:
-          name: install tox dependencies
+          name: install poetry
           command: |
-            pip install --user --quiet -r requirements.txt
+            pip install --user --quiet poetry
 
       - run:
           name: build
           command: |
             poetry build --format sdist
             poetry build --format wheel
+
+      - save_cache:
+          paths:
+            - ./.tox
+          key: v1-dependencies-{{ checksum "pyproject.toml" }}
 
       - run:
           name: lint
@@ -86,7 +91,7 @@ commands:
             bash <(curl -fsSL https://get.docker.com)
             docker login -u redisfab -p $DOCKER_REDISFAB_PWD
             docker build -t redisgraph:<<parameters.docker_version>> .
-            docker pusH
+            docker push
 
 jobs:
   build:
@@ -100,7 +105,7 @@ jobs:
       - build_and_test
 
   # since this is used by cron, we by default build against latest
-  build_and_edge:
+  build_and_publish:
     parameters:
       docker_version:
         type: string
@@ -139,7 +144,6 @@ python-versions: &python-versions
         - "latest"
 
 workflows:
-  version: 2
   commit:
     jobs:
       - build:
@@ -152,4 +156,4 @@ workflows:
           cron: "0 0 * * *"
           <<: *on-master
     jobs:
-      - build_and_edge
+      - build_and_publish
