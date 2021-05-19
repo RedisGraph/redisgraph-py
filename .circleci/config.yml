@@ -40,21 +40,30 @@ commands:
       - abort_for_docs
       - abort_for_noci
       - checkout
+
+      - restore_cache: # Download and cache dependencies
+          keys:
+          - v1-dependencies-{{ checksum "pyproject.toml" }}
+          # fallback to using the latest cache if no exact match is found
+          - v1-dependencies-
+
       - run:
-          name: install poetry
+          name: install tox dependencies
           command: |
-            pip install --user --quiet poetry
+            pip install --user --quiet -r .circleci/circle_requirements.txt
+
+      - save_cache:
+          paths:
+            - ./.tox
+            - ~/.cache/pip
+          key: v1-dependencies-{{ checksum "pyproject.toml" }}
+
 
       - run:
           name: build
           command: |
             poetry build --format sdist
             poetry build --format wheel
-
-      - save_cache:
-          paths:
-            - ./.tox
-          key: v1-dependencies-{{ checksum "pyproject.toml" }}
 
       - run:
           name: lint
@@ -71,7 +80,7 @@ commands:
 
       - early_return_for_forked_pull_requests
       - run:
-          name: codecove
+          name: codecov
           command: |
             . .tox/func/bin/activate
             codecov --file .tox/cover/report/coverage.xml --name ${CODECOV_NAME}-unittests
