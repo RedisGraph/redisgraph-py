@@ -96,7 +96,6 @@ commands:
           name: dockers
           description: Build and release docker
           command: |
-            bash <(curl -fsSL https://get.docker.com)
             docker login -u redisfab -p $DOCKER_REDISFAB_PWD
             docker build -t redisgraph:<<parameters.docker_version>> .
             docker push
@@ -154,7 +153,7 @@ python-versions: &python-versions
 workflows:
   commit:
     jobs:
-      - build:
+      - build_and_publish:
          <<: *on-any-branch
          <<: *python-versions
 
