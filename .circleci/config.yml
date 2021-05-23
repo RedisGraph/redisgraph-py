@@ -1,9 +1,27 @@
-# Python CircleCI 2.0 configuration file
-#
-# Check https://circleci.com/docs/2.0/language-python/ for more details
-#
 version: 2.1
 commands:
+
+  abort_for_docs:
+    steps:
+      - run:
+          name: Avoid tests for docs
+          command: |
+            if [[ $CIRCLE_BRANCH == *docs ]]; then
+              echo "Identifies as documents PR, no testing required"
+              circleci step halt
+            fi
+
+  abort_for_noci:
+    steps:
+      - run:
+          name: Ignore CI for specific branches
+          command: |
+            if [[ $CIRCLE_BRANCH == *noci ]]; then
+              echo "Identifies as actively ignoring CI, no testing required."
+              circleci step halt
+            fi
+
+
   early_return_for_forked_pull_requests:
     description: >-
       If this build is from a fork, stop executing the current job and return success.
@@ -12,33 +30,44 @@ commands:
       - run:
           name: Early return if this build is from a forked PR
           command: |
-            if [ -n "$CIRCLE_PR_NUMBER" ]; then
+            if [[ -n "$CIRCLE_PR_NUMBER" ]]; then
               echo "Nothing to do for forked PRs, so marking this step successful"
               circleci step halt
             fi
-jobs:
-  build:
-    docker:
-      - image: circleci/python:3.6.1
 
-      - image: redislabs/redisgraph:edge
-
-    working_directory: ~/repo
-
+  build_and_test:
     steps:
+      - abort_for_docs
+      - abort_for_noci
       - checkout
 
-      - run:
-          name: Install tox
-          command: sudo pip install tox
+      - restore_cache: # Download and cache dependencies
+          keys:
+          - v1-dependencies-{{ checksum "pyproject.toml" }}
+          # fallback to using the latest cache if no exact match is found
+          - v1-dependencies-
 
       - run:
-          name: Test package build
-          command: tox -e sdist
+          name: install tox dependencies
+          command: |
+            pip install --user --quiet -r .circleci/circle_requirements.txt
+
+      - save_cache:
+          paths:
+            - ./.tox
+            - ~/.cache/pip
+          key: v1-dependencies-{{ checksum "pyproject.toml" }}
+
 
       - run:
-          name: Run code styles
-          command: tox -e pep8
+          name: build sdist and wheels
+          command: |
+            poetry build
+
+      - run:
+          name: lint
+          command: |
+            tox -e linters
 
       - run:
           name: Run unittest with coverage
@@ -49,27 +78,90 @@ jobs:
           command: tox -e func
 
       - early_return_for_forked_pull_requests
-
       - run:
-          name: codecove
+          name: codecov
           command: |
             . .tox/func/bin/activate
             codecov --file .tox/cover/report/coverage.xml --name ${CODECOV_NAME}-unittests
             codecov --file .tox/func/report/coverage.xml --name ${CODECOV_NAME}-functional
 
+  docker:
+    parameters:
+      docker_version:
+        type: string
+        default: "edge"
+    steps:
+      - setup_remote_docker
+      - run:
+          name: dockers
+          description: Build and release docker
+          command: |
+            bash <(curl -fsSL https://get.docker.com)
+            docker login -u redisfab -p $DOCKER_REDISFAB_PWD
+            docker build -t redisgraph:<<parameters.docker_version>> .
+            docker push
+
+jobs:
+  build:
+    parameters:
+      python_version:
+        type: string
+    docker:
+      - image: circleci/python:<<parameters.python_version>>
+      - image: redislabs/redisgraph:edge
+    steps:
+      - build_and_test
+
+  # since this is used by cron, we by default build against latest
+  build_and_publish:
+    parameters:
+      docker_version:
+        type: string
+        default: "edge"
+    docker:
+      - image: circleci/python:latest
+      - image: redislabs/redisgraph:edge
+
+    steps:
+      - build_and_test
+      - docker
+
+on-any-branch: &on-any-branch
+  filters:
+    branches:
+      only:
+        - /.*/
+    tags:
+      ignore: /.*/
+
+on-master: &on-master
+  filters:
+    branches:
+      only:
+        - master
+
+# the is to build and test, per commit against all supported python versions
+python-versions: &python-versions
+  matrix:
+    parameters:
+      python_version:
+        - "3.6.9"
+        - "3.7.9"
+        - "3.8.9"
+        - "3.9.4"
+        - "latest"
 
 workflows:
-  version: 2
   commit:
     jobs:
-      - build
+      - build:
+         <<: *on-any-branch
+         <<: *python-versions
+
   nightly:
     triggers:
       - schedule:
           cron: "0 0 * * *"
-          filters:
-            branches:
-              only:
-                - master
+          <<: *on-master
     jobs:
-      - build
+      - build_and_publish
