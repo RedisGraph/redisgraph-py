@@ -155,7 +155,7 @@ workflows:
     jobs:
       - build_and_publish:
          <<: *on-any-branch
-         <<: *python-versions
+           #<<: *python-versions
 
   nightly:
     triggers:
