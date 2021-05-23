@@ -97,7 +97,7 @@ commands:
           description: Build and release docker
           command: |
             docker login -u redisfab -p $DOCKER_REDISFAB_PWD
-            docker build -t redisgraph:<<parameters.docker_version>> .
+            docker build -t redisgraph-py:<<parameters.docker_version>> .
             docker push
 
 jobs:
@@ -153,9 +153,9 @@ python-versions: &python-versions
 workflows:
   commit:
     jobs:
-      - build_and_publish:
+      - build:
          <<: *on-any-branch
-           #<<: *python-versions
+         <<: *python-versions
 
   nightly:
     triggers:
