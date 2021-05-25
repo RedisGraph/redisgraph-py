@@ -10,18 +10,31 @@ class Graph:
     Graph, collection of nodes and edges.
     """
 
-    def __init__(self, name, redis_con):
+    def __init__(self, name, redis_con=None, host=None, port=None, password=None):
         """
         Create a new graph.
         """
         self.name = name                 # Graph key
-        self.redis_con = redis_con
+        if redis_con is not None:
+            self.close_con = False
+            self.redis_con = redis_con
+        elif host is not None and port is not None:
+            self.close_con = True
+            self.redis_con = redis.Redis(host, port, password=password)
+        else:
+            raise RuntimeError(
+                "The constructor must have redis_con argument or host and port."
+            )
         self.nodes = {}
         self.edges = []
         self._labels = []                # List of node labels.
         self._properties = []            # List of properties.
         self._relationshipTypes = []     # List of relation types.
         self.version = 0                 # Graph version
+
+    def __del__(self):
+        if self.close_con:               # Close the connection only if it was
+            self.redis_con.close()       # created by the constructor.
 
     def _clear_schema(self):
         self._labels = []
