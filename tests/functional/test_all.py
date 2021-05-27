@@ -46,6 +46,19 @@ class TestStringMethods(base.TestCase):
         # All done, remove graph.
         redis_graph.delete()
 
+    def test_graph_connection(self):
+        connections = len(self.r.client_list())
+        redis_graph = Graph('social', self.r)
+        del redis_graph
+        self.assertTrue(self.r.ping())
+        self.assertTrue(len(self.r.client_list()) == connections)
+
+        new_graph = Graph('social-new')
+        self.assertTrue(new_graph.redis_con.ping())
+        self.assertTrue(len(self.r.client_list()) == connections + 1)
+        del new_graph
+        self.assertTrue(len(self.r.client_list()) == connections)
+
     def test_array_functions(self):
         redis_graph = Graph('social', self.r)
 
