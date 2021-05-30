@@ -196,10 +196,6 @@ class Graph:
         """
         Get the execution plan for given query,
         GRAPH.EXPLAIN returns an array of operations.
-
-        Args:
-            query: The query that executes on the graph
-            params: CYPHER headers parameters
         """
         if params is not None:
             query = self.build_params_header(params) + query
