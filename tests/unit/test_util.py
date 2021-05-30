@@ -14,5 +14,4 @@ class TestUtils(base.TestCase):
         self.assertEqual(util.quote_string(10), 10)
         self.assertEqual(util.quote_string("abc"), '"abc"')
         self.assertEqual(util.quote_string(""), '""')
-        self.assertEqual(util.quote_string('"'), '"')
         self.assertEqual(util.quote_string('a"a'), '"a\\"a"')
