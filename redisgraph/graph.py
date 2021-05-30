@@ -13,6 +13,10 @@ class Graph:
     def __init__(self, name, redis_con):
         """
         Create a new graph.
+
+        Args:
+            name: The graph's key
+            redis_con: Connection to redis
         """
         self.name = name                 # Graph key
         self.redis_con = redis_con
@@ -148,6 +152,12 @@ class Graph:
     def query(self, q, params=None, timeout=None, read_only=False):
         """
         Executes a query against the graph.
+
+        Args:
+            q: The query that executes on the graph
+            params: CYPHER headers parameters
+            timeout: positive integer that specifies the maximum runtime for read queries in milliseconds.
+            read_only: ?
         """
 
         # maintain original 'q'
@@ -196,6 +206,10 @@ class Graph:
         """
         Get the execution plan for given query,
         GRAPH.EXPLAIN returns an array of operations.
+
+        Args:
+            query: The query that executes on the graph
+            params: CYPHER headers parameters
         """
         if params is not None:
             query = self.build_params_header(params) + query
