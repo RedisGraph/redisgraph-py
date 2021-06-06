@@ -3,7 +3,7 @@ from .util import quote_string
 
 class Node:
     """
-    A node within the garph.
+    A node within the graph.
     """
     def __init__(self, node_id=None, alias=None, label=None, properties=None):
         """

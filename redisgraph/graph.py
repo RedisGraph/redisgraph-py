@@ -13,6 +13,10 @@ class Graph:
     def __init__(self, name, redis_con):
         """
         Create a new graph.
+
+        Args:
+            name: string that represents the name of the graph
+            redis_con: connection to Redis
         """
         self.name = name                 # Graph key
         self.redis_con = redis_con
@@ -59,6 +63,12 @@ class Graph:
             self._properties[i] = p[0]
 
     def get_label(self, idx):
+        """
+        Returns a label by it's index
+
+        Args:
+            idx: The index of the label
+        """
         try:
             label = self._labels[idx]
         except IndexError:
@@ -68,6 +78,12 @@ class Graph:
         return label
 
     def get_relation(self, idx):
+        """
+        Returns a relationship type by it's index
+
+        Args:
+            idx: The index of the relation
+        """
         try:
             relationshipType = self._relationshipTypes[idx]
         except IndexError:
@@ -77,6 +93,12 @@ class Graph:
         return relationshipType
 
     def get_property(self, idx):
+        """
+        Returns a property by it's index
+
+        Args:
+            idx: The index of the property
+        """
         try:
             propertie = self._properties[idx]
         except IndexError:
@@ -130,7 +152,7 @@ class Graph:
         self.nodes = {}
         self.edges = []
 
-    def build_params_header(self, params):
+    def _build_params_header(self, params):
         if not isinstance(params, dict):
             raise TypeError("'params' must be a dict")
         # Header starts with "CYPHER"
@@ -148,6 +170,12 @@ class Graph:
     def query(self, q, params=None, timeout=None, read_only=False):
         """
         Executes a query against the graph.
+
+        Args:
+            q: the query
+            params: query parameters
+            timeout: maximum runtime for read queries in milliseconds
+            read_only: executes a readonly query if set to True
         """
 
         # maintain original 'q'
@@ -155,7 +183,7 @@ class Graph:
 
         # handle query parameters
         if params is not None:
-            query = self.build_params_header(params) + query
+            query = self._build_params_header(params) + query
 
         # construct query command
         # ask for compact result-set format
@@ -196,9 +224,13 @@ class Graph:
         """
         Get the execution plan for given query,
         GRAPH.EXPLAIN returns an array of operations.
+
+        Args:
+            query: the query that will be executed
+            params: query parameters
         """
         if params is not None:
-            query = self.build_params_header(params) + query
+            query = self._build_params_header(params) + query
 
         plan = self.redis_con.execute_command("GRAPH.EXPLAIN", self.name, query, query)
         return self._execution_plan_to_string(plan)
