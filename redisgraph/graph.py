@@ -10,7 +10,7 @@ class Graph:
     Graph, collection of nodes and edges.
     """
 
-    def __init__(self, name, redis_con):
+    def __init__(self, name, redis_con=None, host='localhost', port=6379, password=None):
         """
         Create a new graph.
 
@@ -19,7 +19,11 @@ class Graph:
             redis_con: connection to Redis
         """
         self.name = name                 # Graph key
-        self.redis_con = redis_con
+        if redis_con is not None:
+            self.redis_con = redis_con
+        else:
+            self.redis_con = redis.Redis(host, port, password=password)
+
         self.nodes = {}
         self.edges = []
         self._labels = []                # List of node labels.
