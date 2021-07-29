@@ -56,8 +56,6 @@ class TestStringMethods(base.TestCase):
         new_graph = Graph('social-new')
         self.assertTrue(new_graph.redis_con.ping())
         self.assertTrue(len(self.r.client_list()) == connections + 1)
-        del new_graph
-        self.assertTrue(len(self.r.client_list()) == connections)
 
     def test_array_functions(self):
         redis_graph = Graph('social', self.r)
