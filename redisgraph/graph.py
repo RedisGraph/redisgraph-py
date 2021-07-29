@@ -236,7 +236,7 @@ class Graph:
         if params is not None:
             query = self._build_params_header(params) + query
 
-        plan = self.redis_con.execute_command("GRAPH.EXPLAIN", self.name, query, query)
+        plan = self.redis_con.execute_command("GRAPH.EXPLAIN", self.name, query)
         return self._execution_plan_to_string(plan)
 
     def delete(self):
