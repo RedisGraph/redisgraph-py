@@ -159,8 +159,7 @@ class Graph:
     def _build_params_header(self, params):
         if not isinstance(params, dict):
             raise TypeError("'params' must be a dict")
-        # Header starts with "CYPHER"
-        params_header = "query_params"
+        params_header = ""
         for key, value in params.items():
             # If value is string add quotation marks.
             if isinstance(value, str):
@@ -168,7 +167,7 @@ class Graph:
             # Value is None, replace with "null" string.
             elif value is None:
                 value = "null"
-            params_header += " " + str(key) + "=" + str(value)
+            params_header += str(key) + "=" + str(value) + " "
         return params_header
 
     def query(self, q, params=None, timeout=None, read_only=False):
@@ -190,10 +189,11 @@ class Graph:
         # specify known graph version
         cmd = "GRAPH.RO_QUERY" if read_only else "GRAPH.QUERY"
         # command = [cmd, self.name, query, "--compact", "version", self.version]
-        if params is not None:
-            command = [cmd, self.name, query, self._build_params_header(params), "--compact"]
-        else:
-            command = [cmd, self.name, query, "--compact"]
+        command = [cmd, self.name, query, "--compact"]
+
+        # query params are specified
+        if params:
+            command += ["query_params", self._build_params_header(params)]
 
         # include timeout is specified
         if timeout:
@@ -233,7 +233,7 @@ class Graph:
             params: query parameters
         """
         if params is not None:
-            plan = self.redis_con.execute_command("GRAPH.EXPLAIN", self.name, query, self._build_params_header(params))
+            plan = self.redis_con.execute_command("GRAPH.EXPLAIN", self.name, query, "query_params", self._build_params_header(params))
         else:
             plan = self.redis_con.execute_command("GRAPH.EXPLAIN", self.name, query)
         return self._execution_plan_to_string(plan)
