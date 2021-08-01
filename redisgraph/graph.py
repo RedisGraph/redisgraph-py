@@ -160,7 +160,7 @@ class Graph:
         if not isinstance(params, dict):
             raise TypeError("'params' must be a dict")
         # Header starts with "CYPHER"
-        params_header = "CYPHER "
+        params_header = "query_params "
         for key, value in params.items():
             # If value is string add quotation marks.
             if isinstance(value, str):
