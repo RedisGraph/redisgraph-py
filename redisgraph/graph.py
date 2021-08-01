@@ -193,6 +193,7 @@ class Graph:
 
         # query params are specified
         if params:
+            print("AAAAAAA")
             command += ["query_params", self._build_params_header(params)]
 
         # include timeout is specified
