@@ -157,7 +157,10 @@ class Graph:
         self.edges = []
 
     def _build_params_header(self, params):
-        if not isinstance(params, dict):
+        if isinstance(params, str):
+            #params is in header format use it as is
+            return params
+        elif not isinstance(params, dict):
             raise TypeError("'params' must be a dict")
         # Header starts with "CYPHER"
         params_header = "CYPHER "
