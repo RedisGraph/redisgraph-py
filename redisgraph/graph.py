@@ -162,14 +162,24 @@ class Graph:
         # Header starts with "CYPHER"
         params_header = "CYPHER "
         for key, value in params.items():
-            # If value is string add quotation marks.
-            if isinstance(value, str):
-                value = quote_string(value)
-            # Value is None, replace with "null" string.
-            elif value is None:
-                value = "null"
-            params_header += str(key) + "=" + str(value) + " "
+            params_header += str(key) + "=" + str(self._parse_value(value)) + " "
         return params_header
+
+    def _parse_value(self, value):
+        # If value is string add quotation marks.
+        if isinstance(value, str):
+            value = quote_string(value)
+        # If value is dictionary, need to remove quotation mark
+        elif isinstance(value, dict):
+            temp_value = "{"
+            for key, val in value.items():
+                temp_value += str(key) + ":" + str(val) + ","
+            value = temp_value[:-1] + "}"
+        # Value is None, replace with "null" string.
+        elif value is None:
+            value = "null"
+
+        return value
 
     def query(self, q, params=None, timeout=None, read_only=False):
         """
