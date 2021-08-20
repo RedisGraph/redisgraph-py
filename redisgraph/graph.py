@@ -1,6 +1,6 @@
 import redis
 
-from redisgraph.util import random_string, quote_string
+from redisgraph.util import random_string, quote_string, stringify_param_value
 from redisgraph.query_result import QueryResult
 from redisgraph.exceptions import VersionMismatchException
 
@@ -162,13 +162,7 @@ class Graph:
         # Header starts with "CYPHER"
         params_header = "CYPHER "
         for key, value in params.items():
-            # If value is string add quotation marks.
-            if isinstance(value, str):
-                value = quote_string(value)
-            # Value is None, replace with "null" string.
-            elif value is None:
-                value = "null"
-            params_header += str(key) + "=" + str(value) + " "
+            params_header += str(key) + "=" + stringify_param_value(value) + " "
         return params_header
 
     def query(self, q, params=None, timeout=None, read_only=False):
