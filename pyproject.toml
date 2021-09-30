@@ -2,7 +2,7 @@
 name = "redisgraph"
 version = "2.4.0"
 description = "RedisGraph Python Client"
-authors = ["Redis <oss@.com>"]
+authors = ["Redis <oss@redis.com>"]
 license = "BSD-3-Clause"
 readme = "README.md"
 keywords = ["Redis", "Graph"]
