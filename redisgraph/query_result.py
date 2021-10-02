@@ -58,8 +58,10 @@ class QueryResult:
             self.parse_statistics(response[0])
         else:
             # start by parsing statistics, matches the one we have
-            self.parse_statistics(response[-1])  # Last element.
+            self.parse_statistics(response[2])  # Third element, after header and records.
             self.parse_results(response)
+            if len(response) == 4:
+                self.parse_metadata(response[3])
 
     def _check_for_errors(self, response):
         if isinstance(response[0], ResponseError):
@@ -94,6 +96,23 @@ class QueryResult:
             v = self._get_value(s, raw_statistics)
             if v is not None:
                 self.statistics[s] = v
+
+    def parse_metadata(self, raw_metadata):
+        # Decode metadata:
+        # {
+        #   "version", VERSION,
+        #   "labels", [[VALUE_STRING, "label_1"] ... ],
+        #   "relationship types ", [[VALUE_STRING, "reltype_1"] ... ],
+        #   "property keys", [[VALUE_STRING, "prop_1"] ... ]
+        # }
+        metadata = self.parse_map(raw_metadata)
+        version = metadata["version"]
+        labels = metadata["labels"]
+        reltypes = metadata["relationship types"]
+        properties = metadata["property keys"]
+
+        # Update the graph's internal metadata.
+        self.graph.refresh_metadata(version, labels, reltypes, properties)
 
     def parse_header(self, raw_result_set):
         # An array of column name/column type pairs.

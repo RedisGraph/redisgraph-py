@@ -66,6 +66,12 @@ class Graph:
         for i, p in enumerate(props):
             self._properties[i] = p[0]
 
+    def refresh_metadata(self, version, labels, reltypes, properties):
+        self.version = version
+        self._labels = labels
+        self._relationshipTypes = reltypes
+        self._properties = properties
+
     def get_label(self, idx):
         """
         Returns a label by it's index
@@ -187,8 +193,8 @@ class Graph:
         # ask for compact result-set format
         # specify known graph version
         cmd = "GRAPH.RO_QUERY" if read_only else "GRAPH.QUERY"
-        # command = [cmd, self.name, query, "--compact", "version", self.version]
-        command = [cmd, self.name, query, "--compact"]
+        command = [cmd, self.name, query, "--compact", "version", self.version]
+        #  command = [cmd, self.name, query, "--compact"]
 
         # include timeout is specified
         if timeout:

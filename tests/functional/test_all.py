@@ -359,6 +359,18 @@ class TestStringMethods(base.TestCase):
         assert(A._relationshipTypes[0] == 'S')
         assert(A._relationshipTypes[1] == 'R')
 
+    def test_metadata(self):
+        A = Graph('metadata', self.r)
+        # Since this query modifies schemas and returns data, it should
+        # update all graph metadata in a single call.
+        A.query("CREATE (l:L {v: 1}) RETURN l")
+        assert(len(A._labels) == 1)
+        assert(len(A._properties) == 1)
+        assert(len(A._relationshipTypes) == 0)
+        assert(A._labels[0] == 'L')
+        assert(A._properties[0] == 'v')
+        assert(A.version != 0)
+
 
 if __name__ == '__main__':
     unittest.main()
