@@ -27,7 +27,10 @@ class Node:
         if self.alias:
             res += self.alias
         if self.label:
-            res += ':' + self.label
+            if isinstance(self.label, list):
+                res += ":" + ":".join(self.label)
+            else:
+                res += ':' + self.label
         if self.properties:
             props = ','.join(key+':'+str(quote_string(val)) for key, val in sorted(self.properties.items()))
             res += '{' + props + '}'

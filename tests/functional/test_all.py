@@ -359,6 +359,22 @@ class TestStringMethods(base.TestCase):
         assert(A._relationshipTypes[0] == 'S')
         assert(A._relationshipTypes[1] == 'R')
 
+    def test_multi_label(self):
+        redis_graph = Graph('g', self.r)
+
+        node = Node(label=['l', 'll'])
+        redis_graph.add_node(node)
+
+        redis_graph.commit()
+
+        query = 'MATCH (n) RETURN n'
+
+        result = redis_graph.query(query)
+
+        result_node = result.result_set[0][0]
+
+        self.assertEqual(result_node, node)
+
 
 if __name__ == '__main__':
     unittest.main()
