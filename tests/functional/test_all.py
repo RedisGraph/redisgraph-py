@@ -375,6 +375,18 @@ class TestStringMethods(base.TestCase):
 
         self.assertEqual(result_node, node)
 
+        try:
+            Node(label=1)
+            self.assertTrue(False)
+        except:
+            self.assertTrue(True)
+
+        try:
+            Node(label=['l', 1])
+            self.assertTrue(False)
+        except:
+            self.assertTrue(True)
+
 
 if __name__ == '__main__':
     unittest.main()
