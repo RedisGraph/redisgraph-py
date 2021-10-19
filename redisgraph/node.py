@@ -11,7 +11,7 @@ class Node:
         """
         self.id = node_id
         self.alias = alias
-        if not (label is None or isinstance(label, str) or (isinstance(label, list) and all([isinstance(l, str) for l in label]))):
+        if not (label is None or isinstance(label, str) or (isinstance(label, list) and all([isinstance(inner_label, str) for inner_label in label]))):
             raise AssertionError("label should be either None, string or a list of strings")
         self.label = label
         self.properties = properties or {}

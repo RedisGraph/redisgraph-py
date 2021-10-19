@@ -378,13 +378,13 @@ class TestStringMethods(base.TestCase):
         try:
             Node(label=1)
             self.assertTrue(False)
-        except:
+        except AssertionError:
             self.assertTrue(True)
 
         try:
             Node(label=['l', 1])
             self.assertTrue(False)
-        except:
+        except AssertionError:
             self.assertTrue(True)
 
 
