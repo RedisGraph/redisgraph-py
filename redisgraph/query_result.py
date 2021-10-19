@@ -147,8 +147,8 @@ class QueryResult:
             label = self.graph.get_label(cell[1][0])
         elif len(cell[1]) > 1:
             label = []
-            for l in cell[1]:
-                label.append(self.graph.get_label(l))
+            for inner_label in cell[1]:
+                label.append(self.graph.get_label(inner_label))
         properties = self.parse_entity_properties(cell[2])
         return Node(node_id=node_id, label=label, properties=properties)
 
