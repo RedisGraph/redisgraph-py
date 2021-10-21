@@ -11,10 +11,12 @@ class TestNode(base.TestCase):
         self.props_only = node.Node(properties={"a": "a", "b": 10})
         self.no_label = node.Node(node_id=1, alias="alias",
                                   properties={"a": "a"})
+        self.multi_label = node.Node(node_id=1, alias="alias", label=["l", "ll"])
 
     def test_toString(self):
         self.assertEqual(self.no_args.toString(), "")
         self.assertEqual(self.no_props.toString(), "")
+        self.assertEqual(self.multi_label.toString(), "")
         self.assertEqual(self.props_only.toString(), '{a:"a",b:10}')
         self.assertEqual(self.no_label.toString(), '{a:"a"}')
 
@@ -23,6 +25,7 @@ class TestNode(base.TestCase):
         self.assertEqual(str(self.no_props), "(alias:l)")
         self.assertEqual(str(self.props_only), '({a:"a",b:10})')
         self.assertEqual(str(self.no_label), '(alias{a:"a"})')
+        self.assertEqual(str(self.multi_label), "(alias:l:ll)")
 
     def test_comparision(self):
 
