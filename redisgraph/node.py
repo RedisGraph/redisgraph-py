@@ -11,7 +11,11 @@ class Node:
         """
         self.id = node_id
         self.alias = alias
-        if label is None or (isinstance(label, list) and len(label) == 0):
+        
+        if isinstance(label, list):
+            label = [inner_label for inner_label in label if inner_label != ""]
+
+        if label is None or label == "" or (isinstance(label, list) and len(label) == 0):
             self.label = None
             self.labels = None
         elif isinstance(label, str):
