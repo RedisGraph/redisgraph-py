@@ -252,7 +252,7 @@ class TestStringMethods(base.TestCase):
 
         result = redis_graph.execution_plan("MATCH (r:Rider)-[:rides]->(t:Team) WHERE t.name = $name RETURN r.name, t.name, $params", {'name': 'Yehuda'})
         expected = "Results\n    Project\n        Conditional Traverse | (t:Team)->(r:Rider)\n            Filter\n                Node By Label Scan | (t:Team)"
-        self.assertEqual(result, expected)
+        self.assertEqual(str(result), expected)
 
         redis_graph.delete()
 

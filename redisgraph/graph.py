@@ -3,6 +3,7 @@ import redis
 from redisgraph.util import random_string, quote_string, stringify_param_value
 from redisgraph.query_result import QueryResult
 from redisgraph.exceptions import VersionMismatchException
+from redisgraph.execution_plan import ExecutionPlan
 
 
 class Graph:
@@ -215,9 +216,6 @@ class Graph:
             # re-issue query
             return self.query(q, params, timeout, read_only)
 
-    def _execution_plan_to_string(self, plan):
-        return "\n".join(plan)
-
     def execution_plan(self, query, params=None):
         """
         Get the execution plan for given query,
@@ -231,7 +229,7 @@ class Graph:
             query = self._build_params_header(params) + query
 
         plan = self.redis_con.execute_command("GRAPH.EXPLAIN", self.name, query)
-        return self._execution_plan_to_string(plan)
+        return ExecutionPlan(plan)
 
     def delete(self):
         """
