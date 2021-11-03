@@ -254,7 +254,7 @@ class TestStringMethods(base.TestCase):
         expected = "Results\n    Project\n        Conditional Traverse | (t:Team)->(r:Rider)\n            Filter\n                Node By Label Scan | (t:Team)"
         self.assertEqual(str(result), expected)
 
-        expected = {'children': [{'children': [{'children': [{'children': [{'op': 'Node By Label Scan | (t:Team)'}], 
+        expected = {'children': [{'children': [{'children': [{'children': [{'op': 'Node By Label Scan | (t:Team)'}],
                                                               'op': 'Filter'}],
                                                 'op': 'Conditional Traverse | (t:Team)->(r:Rider)'}],
                                   'op': 'Project'}],
