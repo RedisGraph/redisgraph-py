@@ -14,10 +14,10 @@ class ExecutionPlan:
             op = self.plan[i]
             op_level = op.count("    ")
             if op_level == level:
-                current = { "op": op.replace("    ", "")}
+                current = {"op": op.replace("    ", "")}
                 i += 1
             elif op_level == level + 1:
-                child = { "op": op.replace("    ", "")}
+                child = {"op": op.replace("    ", "")}
                 if "children" not in current:
                     current["children"] = []
                 current["children"].append(child)
