@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "redisgraph"
-version = "2.4.1"
+version = "2.4.2"
 description = "RedisGraph Python Client"
 authors = ["Redis <oss@redis.com>"]
 license = "BSD-3-Clause"
