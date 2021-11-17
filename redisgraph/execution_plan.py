@@ -12,7 +12,7 @@ class Operation:
         if not isinstance(o, Operation):
             return False
 
-        if self.name != o.name or self.args != self.args or len(self.children) != len(o.children):
+        if self.name != o.name or self.args != o.args or len(self.children) != len(o.children):
             return False
 
         for i in range(len(self.children)):
