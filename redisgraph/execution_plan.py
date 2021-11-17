@@ -11,14 +11,14 @@ class Operation:
     def __eq__(self, o: object) -> bool:
         if not isinstance(o, Operation):
             return False
-        
+
         if self.name != o.name or self.args != self.args or len(self.children) != len(o.children):
             return False
 
         for i in range(len(self.children)):
             if not self.children[i] == o.children[i]:
                 return False
-        
+
         return True
 
 
@@ -31,9 +31,9 @@ class ExecutionPlan:
         return "\n".join(self.plan)
 
     def _operation_tree(self):
-        i       = 0
-        level   = 0
-        stack   = []
+        i = 0
+        level = 0
+        stack = []
         current = None
 
         while i < len(self.plan):

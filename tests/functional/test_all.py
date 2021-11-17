@@ -256,9 +256,9 @@ class TestStringMethods(base.TestCase):
         self.assertEqual(str(result), expected)
 
         expected = Operation('Results') \
-            .append_child(Operation('Project') \
-                .append_child(Operation('Conditional Traverse', "(t:Team)->(r:Rider)") \
-                    .append_child(Operation("Filter") \
+            .append_child(Operation('Project')
+                .append_child(Operation('Conditional Traverse', "(t:Team)->(r:Rider)")
+                    .append_child(Operation("Filter")
                         .append_child(Operation('Node By Label Scan', "(t:Team)")))))
 
         self.assertEqual(result.structured_plan, expected)
