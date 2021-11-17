@@ -1,4 +1,5 @@
 import unittest
+from redisgraph.execution_plan import Operation
 from tests.utils import base
 
 import redis
@@ -254,12 +255,13 @@ class TestStringMethods(base.TestCase):
         expected = "Results\n    Project\n        Conditional Traverse | (t:Team)->(r:Rider)\n            Filter\n                Node By Label Scan | (t:Team)"
         self.assertEqual(str(result), expected)
 
-        expected = {'children': [{'children': [{'children': [{'children': [{'op': 'Node By Label Scan | (t:Team)'}],
-                                                              'op': 'Filter'}],
-                                                'op': 'Conditional Traverse | (t:Team)->(r:Rider)'}],
-                                  'op': 'Project'}],
-                    'op': 'Results'}
-        self.assertEqual(result.operation_tree(), expected)
+        expected = Operation('Results') \
+            .append_child(Operation('Project') \
+                .append_child(Operation('Conditional Traverse', "(t:Team)->(r:Rider)") \
+                    .append_child(Operation("Filter") \
+                        .append_child(Operation('Node By Label Scan', "(t:Team)")))))
+
+        self.assertEqual(result.structured_plan, expected)
 
         redis_graph.delete()
 
