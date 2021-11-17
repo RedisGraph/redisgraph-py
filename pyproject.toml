@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "redisgraph"
-version = "2.4.0"
+version = "2.4.2"
 description = "RedisGraph Python Client"
 authors = ["Redis <oss@redis.com>"]
 license = "BSD-3-Clause"
@@ -25,7 +25,7 @@ repository = "https://github.com/RedisGraph/redisgraph-py"
 
 [tool.poetry.dependencies]
 python = "^3.6"
-redis = "^3.5.3"
+redis = "3.5.3"
 hiredis = "^2.0.0"
 prettytable = "^2.1.0"
 
