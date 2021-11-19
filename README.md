@@ -35,7 +35,7 @@ redis_graph.add_edge(edge)
 redis_graph.commit()
 
 query = """MATCH (p:person)-[v:visited {purpose:"pleasure"}]->(c:country)
-		   RETURN p.name, p.age, v.purpose, c.name"""
+           RETURN p.name, p.age, v.purpose, c.name"""
 
 result = redis_graph.query(query)
 
@@ -45,7 +45,7 @@ result.pretty_print()
 # Use parameters
 params = {'purpose':"pleasure"}
 query = """MATCH (p:person)-[v:visited {purpose:$purpose}]->(c:country)
-		   RETURN p.name, p.age, v.purpose, c.name"""
+           RETURN p.name, p.age, v.purpose, c.name"""
 
 result = redis_graph.query(query, params)
 
@@ -57,10 +57,10 @@ result = redis_graph.query(query, params, timeout=10)
 
 # Iterate through resultset
 for record in result.result_set:
-	person_name = record[0]
-	person_age = record[1]
-	visit_purpose = record[2]
-	country_name = record[3]
+    person_name = record[0]
+    person_age = record[1]
+    visit_purpose = record[2]
+    country_name = record[3]
 
 query = """MATCH p = (:person)-[:visited {purpose:"pleasure"}]->(:country) RETURN p"""
 
