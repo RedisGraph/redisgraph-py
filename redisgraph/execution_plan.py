@@ -5,6 +5,9 @@ class Operation:
         self.children = []
 
     def append_child(self, child):
+        if not isinstance(child, Operation) or self is child:
+            raise Exception("child must be Operation")
+
         self.children.append(child)
         return self
 
@@ -21,9 +24,20 @@ class Operation:
 
         return True
 
+    def __str__(self) -> str:
+        args_str = "" if self.args is None else f" | {self.args}"
+        if len(self.children) == 0:
+            return f"{self.name}{args_str}"
+        else:
+            children = "\n".join(["    " + line for op in self.children for line in str(op).splitlines()])
+            return f"{self.name}{args_str}\n{children}"
+
 
 class ExecutionPlan:
     def __init__(self, plan):
+        if not isinstance(plan, list):
+            raise Exception("plan must be array")
+
         self.plan = plan
         self.structured_plan = self._operation_tree()
 
@@ -46,7 +60,7 @@ class ExecutionPlan:
             elif op_level == level + 1:
                 args = op.split("|")
                 child = Operation(args[0].strip(), None if len(args) == 1 else args[1].strip())
-                current.children.append(child)
+                current.append_child(child)
                 stack.append(current)
                 current = child
                 level += 1
