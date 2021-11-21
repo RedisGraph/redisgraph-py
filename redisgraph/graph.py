@@ -157,7 +157,10 @@ class Graph:
         self.edges = []
 
     def _build_params_header(self, params):
-        if not isinstance(params, dict):
+        if isinstance(params, str):
+            #params is in header format use it as is
+            return params
+        elif not isinstance(params, dict):
             raise TypeError("'params' must be a dict")
         # Header starts with "CYPHER"
         params_header = "CYPHER "
@@ -179,16 +182,16 @@ class Graph:
         # maintain original 'q'
         query = q
 
-        # handle query parameters
-        if params is not None:
-            query = self._build_params_header(params) + query
-
         # construct query command
         # ask for compact result-set format
         # specify known graph version
         cmd = "GRAPH.RO_QUERY" if read_only else "GRAPH.QUERY"
         # command = [cmd, self.name, query, "--compact", "version", self.version]
         command = [cmd, self.name, query, "--compact"]
+
+        # query params are specified
+        if params:
+            command += ["query_params", self._build_params_header(params)]
 
         # include timeout is specified
         if timeout:
@@ -228,9 +231,9 @@ class Graph:
             params: query parameters
         """
         if params is not None:
-            query = self._build_params_header(params) + query
-
-        plan = self.redis_con.execute_command("GRAPH.EXPLAIN", self.name, query)
+            plan = self.redis_con.execute_command("GRAPH.EXPLAIN", self.name, query, "query_params", self._build_params_header(params))
+        else:
+            plan = self.redis_con.execute_command("GRAPH.EXPLAIN", self.name, query)
         return self._execution_plan_to_string(plan)
 
     def delete(self):
