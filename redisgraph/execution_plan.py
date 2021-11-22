@@ -23,7 +23,7 @@ class Operation:
         return self
 
     def child_count(self):
-        return array_len(self.children)
+        return len(self.children)
 
     def __eq__(self, o: object) -> bool:
         if not isinstance(o, Operation):
@@ -37,6 +37,7 @@ class Operation:
     def __str__(self) -> str:
         args_str = "" if self.args is None else f" | {self.args}"
         return f"{self.name}{args_str}"
+
 
 class ExecutionPlan:
     """
@@ -60,7 +61,7 @@ class ExecutionPlan:
     def _compare_operations(self, root_a, root_b):
         """
             Compare execution plan operation tree
-            
+
             Return: True if operation trees are equal, False otherwise
         """
 
@@ -103,32 +104,50 @@ class ExecutionPlan:
 
         # compare execution trees
         return self._compare_operations(root_a, root_b)
-            
+
     def _operation_traverse(self, op, op_f, aggregate_f, combine_f):
-        # TODO: document function and its arguments
-        child_res = op_f(op)
+        """
+        Traverse operation tree recursively applying functions
+
+        Args:
+            op: operation to traverse
+            op_f: function applied for each operation
+            aggregate_f: aggregation function applied for all children of a single operation
+            combine_f: combine function applied for the operation result and the children result
+        """
+        # apply op_f for each operation
+        op_res = op_f(op)
         if len(op.children) == 0:
-            return child_res
+            return op_res  # no children return
         else:
+            # apply _operation_traverse recursively
             children = [self._operation_traverse(child, op_f, aggregate_f, combine_f) for child in op.children]
-            return combine_f(child_res, aggregate_f(children))
+            # combine the operation result with the children aggregated result
+            return combine_f(op_res, aggregate_f(children))
 
     def _operation_tree(self):
-        # TODO: document!
+        """ Build the operation tree from the string representation """
+
+        # initial state
         i = 0
         level = 0
         stack = []
         current = None
 
+        # iterate plan operations
         while i < len(self.plan):
-            op = self.plan[i]
-            op_level = op.count("    ")
+            current_op = self.plan[i]
+            op_level = current_op.count("    ")
             if op_level == level:
-                args = op.split("|")
+                # if the operation level equal to the current level
+                # set the current operation and move next
+                args = current_op.split("|")
                 current = Operation(args[0].strip(), None if len(args) == 1 else args[1].strip())
                 i += 1
             elif op_level == level + 1:
-                args = op.split("|")
+                # if the operation is child of the current operation
+                # add it as child and set as current operation
+                args = current_op.split("|")
                 child = Operation(args[0].strip(), None if len(args) == 1 else args[1].strip())
                 current.append_child(child)
                 stack.append(current)
@@ -136,6 +155,8 @@ class ExecutionPlan:
                 level += 1
                 i += 1
             elif op_level < level:
+                # if the operation is not child of current operation
+                # go back to it's parent operation
                 levels_back = level - op_level + 1
                 for _ in range(levels_back):
                     current = stack.pop()
@@ -143,4 +164,3 @@ class ExecutionPlan:
             else:
                 raise Exception("corrupted plan")
         return stack[0]
-
