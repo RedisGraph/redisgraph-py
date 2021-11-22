@@ -246,12 +246,19 @@ class TestStringMethods(base.TestCase):
 
     def test_execution_plan(self):
         redis_graph = Graph('execution_plan', self.r)
-        create_query = """CREATE (:Rider {name:'Valentino Rossi'})-[:rides]->(:Team {name:'Yamaha'}),
-        (:Rider {name:'Dani Pedrosa'})-[:rides]->(:Team {name:'Honda'}),
-        (:Rider {name:'Andrea Dovizioso'})-[:rides]->(:Team {name:'Ducati'})"""
+        create_query = """CREATE
+                          (:Rider {name:'Valentino Rossi'})-[:rides]->(:Team {name:'Yamaha'}),
+                          (:Rider {name:'Dani Pedrosa'})-[:rides]->(:Team {name:'Honda'}),
+                          (:Rider {name:'Andrea Dovizioso'})-[:rides]->(:Team {name:'Ducati'})"""
         redis_graph.query(create_query)
 
-        result = redis_graph.execution_plan("MATCH (r:Rider)-[:rides]->(t:Team) WHERE t.name = $name RETURN r.name, t.name, $params UNION MATCH (r:Rider)-[:rides]->(t:Team) WHERE t.name = $name RETURN r.name, t.name, $params", {'name': 'Yehuda'})
+        result = redis_graph.execution_plan("""MATCH (r:Rider)-[:rides]->(t:Team)
+                                               WHERE t.name = $name
+                                               RETURN r.name, t.name, $params
+                                               UNION
+                                               MATCH (r:Rider)-[:rides]->(t:Team)
+                                               WHERE t.name = $name
+                                               RETURN r.name, t.name, $params""", {'name': 'Yehuda'})
         expected = '''\
 Results
     Distinct
