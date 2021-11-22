@@ -271,7 +271,7 @@ Results
                 Conditional Traverse | (t:Team)->(r:Rider)
                     Filter
                         Node By Label Scan | (t:Team)'''
-        self.assertEquals(str(result.structured_plan), expected)
+        self.assertEquals(str(result), expected)
         self.assertEqual(str(result), expected)
 
         expected = Operation('Results') \

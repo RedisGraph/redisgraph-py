@@ -1,5 +1,15 @@
 class Operation:
+    """
+    Operation, single operation of execution plan.
+    """
     def __init__(self, name, args=None):
+        """
+        Create a new operation.
+
+        Args:
+            name: string that represents the name of the operation
+            args: coperation arguments
+        """
         self.name = name
         self.args = args
         self.children = []
@@ -26,23 +36,41 @@ class Operation:
 
     def __str__(self) -> str:
         args_str = "" if self.args is None else f" | {self.args}"
-        if len(self.children) == 0:
-            return f"{self.name}{args_str}"
-        else:
-            children = "\n".join(["    " + line for op in self.children for line in str(op).splitlines()])
-            return f"{self.name}{args_str}\n{children}"
+        return f"{self.name}{args_str}"
 
 
 class ExecutionPlan:
+    """
+    ExecutionPlan, collection of operations.
+    """
     def __init__(self, plan):
+        """
+        Create a new execution plan.
+
+        Args:
+            plan: array of strings that represents the collection operations
+        """
         if not isinstance(plan, list):
             raise Exception("plan must be array")
 
         self.plan = plan
         self.structured_plan = self._operation_tree()
 
+    def _operation_traverse(self, op, op_f, aggregate_f, combine_f):
+        child_res = op_f(op)
+        if len(op.children) == 0:
+            return child_res
+        else:
+            children = [self._operation_traverse(op, op_f, aggregate_f, combine_f) for op in op.children]
+            return combine_f(child_res, aggregate_f(children))
+
     def __str__(self) -> str:
-        return "\n".join(self.plan)
+        def aggraget_str(str_ops):
+            return "\n".join(["    " + line for str_op in str_ops for line in str_op.splitlines()])
+
+        def combine_str(x, y):
+            return f"{x}\n{y}"
+        return self._operation_traverse(self.structured_plan, str, aggraget_str, combine_str)
 
     def _operation_tree(self):
         i = 0
