@@ -29,10 +29,7 @@ class Operation:
         if not isinstance(o, Operation):
             return False
 
-        if self.name != o.name or self.args != o.args:
-            return False
-
-        return True
+        return (self.name == o.name and self.args == o.args)
 
     def __str__(self) -> str:
         args_str = "" if self.args is None else f" | {self.args}"
