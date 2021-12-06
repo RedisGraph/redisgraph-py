@@ -219,6 +219,21 @@ class Graph:
     def execution_plan(self, query, params=None):
         """
         Get the execution plan for given query,
+        GRAPH.EXPLAIN returns an array of operations.
+
+        Args:
+            query: the query that will be executed
+            params: query parameters
+        """
+        if params is not None:
+            query = self._build_params_header(params) + query
+
+        plan = self.redis_con.execute_command("GRAPH.EXPLAIN", self.name, query)
+        return "\n".join(plan)
+
+    def explain(self, query, params=None):
+        """
+        Get the execution plan for given query,
         GRAPH.EXPLAIN returns ExecutionPlan object.
 
         Args:

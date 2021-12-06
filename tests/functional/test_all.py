@@ -246,6 +246,19 @@ class TestStringMethods(base.TestCase):
 
     def test_execution_plan(self):
         redis_graph = Graph('execution_plan', self.r)
+        create_query = """CREATE (:Rider {name:'Valentino Rossi'})-[:rides]->(:Team {name:'Yamaha'}),
+        (:Rider {name:'Dani Pedrosa'})-[:rides]->(:Team {name:'Honda'}),
+        (:Rider {name:'Andrea Dovizioso'})-[:rides]->(:Team {name:'Ducati'})"""
+        redis_graph.query(create_query)
+
+        result = redis_graph.execution_plan("MATCH (r:Rider)-[:rides]->(t:Team) WHERE t.name = $name RETURN r.name, t.name, $params", {'name': 'Yehuda'})
+        expected = "Results\n    Project\n        Conditional Traverse | (t:Team)->(r:Rider)\n            Filter\n                Node By Label Scan | (t:Team)"
+        self.assertEqual(result, expected)
+
+        redis_graph.delete()
+
+    def test_explain(self):
+        redis_graph = Graph('execution_plan', self.r)
         # graph creation / population
         create_query = """CREATE
                           (:Rider {name:'Valentino Rossi'})-[:rides]->(:Team {name:'Yamaha'}),
@@ -253,13 +266,13 @@ class TestStringMethods(base.TestCase):
                           (:Rider {name:'Andrea Dovizioso'})-[:rides]->(:Team {name:'Ducati'})"""
         redis_graph.query(create_query)
 
-        result = redis_graph.execution_plan("""MATCH (r:Rider)-[:rides]->(t:Team)
-                                               WHERE t.name = $name
-                                               RETURN r.name, t.name
-                                               UNION
-                                               MATCH (r:Rider)-[:rides]->(t:Team)
-                                               WHERE t.name = $name
-                                               RETURN r.name, t.name""", {'name': 'Yamaha'})
+        result = redis_graph.explain("""MATCH (r:Rider)-[:rides]->(t:Team)
+                                        WHERE t.name = $name
+                                        RETURN r.name, t.name
+                                        UNION
+                                        MATCH (r:Rider)-[:rides]->(t:Team)
+                                        WHERE t.name = $name
+                                        RETURN r.name, t.name""", {'name': 'Yamaha'})
         expected = '''\
 Results
     Distinct
