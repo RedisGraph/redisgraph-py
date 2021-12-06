@@ -1,18 +1,29 @@
+import re
+
+
+class ProfileStats:
+    def __init__(self, records_produced, execution_time):
+        self.records_produced = records_produced
+        self.execution_time = execution_time
+
+
 class Operation:
     """
     Operation, single operation within execution plan.
     """
 
-    def __init__(self, name, args=None):
+    def __init__(self, name, args=None, profile_stats=None):
         """
         Create a new operation.
 
         Args:
             name: string that represents the name of the operation
             args: operation arguments
+            profile_stats: profile statistics
         """
         self.name = name
         self.args = args
+        self.profile_stats = profile_stats
         self.children = []
 
     def append_child(self, child):
@@ -32,7 +43,7 @@ class Operation:
         return (self.name == o.name and self.args == o.args)
 
     def __str__(self) -> str:
-        args_str = "" if self.args is None else f" | {self.args}"
+        args_str = "" if self.args is None else " | " + " | ".join(self.args)
         return f"{self.name}{args_str}"
 
 
@@ -131,6 +142,17 @@ class ExecutionPlan:
         stack = []
         current = None
 
+        def _create_operation(args):
+            profile_stats = None
+            name = args[0].strip()
+            args.pop(0)
+            if len(args) > 0 and "Records produced" in args[-1]:
+                records_produced = int(re.search("Records produced: (\\d+)", args[-1]).group(1))
+                execution_time = float(re.search("Execution time: (\\d+.\\d+) ms", args[-1]).group(1))
+                profile_stats = ProfileStats(records_produced, execution_time)
+                args.pop(-1)
+            return Operation(name, None if len(args) == 0 else [arg.strip() for arg in args], profile_stats)
+
         # iterate plan operations
         while i < len(self.plan):
             current_op = self.plan[i]
@@ -138,14 +160,12 @@ class ExecutionPlan:
             if op_level == level:
                 # if the operation level equal to the current level
                 # set the current operation and move next
-                args = current_op.split("|")
-                current = Operation(args[0].strip(), None if len(args) == 1 else args[1].strip())
+                current = _create_operation(current_op.split("|"))
                 i += 1
             elif op_level == level + 1:
                 # if the operation is child of the current operation
                 # add it as child and set as current operation
-                args = current_op.split("|")
-                child = Operation(args[0].strip(), None if len(args) == 1 else args[1].strip())
+                child = _create_operation(current_op.split("|"))
                 current.append_child(child)
                 stack.append(current)
                 current = child

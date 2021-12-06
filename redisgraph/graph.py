@@ -231,6 +231,21 @@ class Graph:
         plan = self.redis_con.execute_command("GRAPH.EXPLAIN", self.name, query)
         return ExecutionPlan(plan)
 
+    def profile(self, query, params=None):
+        """
+        Get the profield execution plan for given query,
+        GRAPH.PROFILE returns an array of operations.
+
+        Args:
+            query: the query that will be executed
+            params: query parameters
+        """
+        if params is not None:
+            query = self._build_params_header(params) + query
+
+        plan = self.redis_con.execute_command("GRAPH.PROFILE", self.name, query)
+        return ExecutionPlan(plan)
+
     def delete(self):
         """
         Deletes graph.

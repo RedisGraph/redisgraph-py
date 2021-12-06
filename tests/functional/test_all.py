@@ -290,6 +290,52 @@ Results
 
         redis_graph.delete()
 
+    def test_profile(self):
+        redis_graph = Graph('profile', self.r)
+        create_query = """CREATE
+                          (:Rider {name:'Valentino Rossi'})-[:rides]->(:Team {name:'Yamaha'}),
+                          (:Rider {name:'Dani Pedrosa'})-[:rides]->(:Team {name:'Honda'}),
+                          (:Rider {name:'Andrea Dovizioso'})-[:rides]->(:Team {name:'Ducati'})"""
+        redis_graph.query(create_query)
+
+        result = redis_graph.profile("""MATCH (r:Rider)-[:rides]->(t:Team)
+                                        WHERE t.name = $name
+                                        RETURN r.name, t.name, $params
+                                        UNION
+                                        MATCH (r:Rider)-[:rides]->(t:Team)
+                                        WHERE t.name = $name
+                                        RETURN r.name, t.name, $params""", {'name': 'Yehuda'})
+        expected = '''\
+Results
+    Distinct
+        Join
+            Project
+                Conditional Traverse | (t:Team)->(r:Rider)
+                    Filter
+                        Node By Label Scan | (t:Team)
+            Project
+                Conditional Traverse | (t:Team)->(r:Rider)
+                    Filter
+                        Node By Label Scan | (t:Team)'''
+        self.assertEqual(str(result), expected)
+
+        expected = Operation('Results') \
+            .append_child(Operation('Distinct')
+                          .append_child(Operation('Join')
+                                        .append_child(Operation('Project')
+                                                      .append_child(Operation('Conditional Traverse', "(t:Team)->(r:Rider)")
+                                                                    .append_child(Operation("Filter")
+                                                                                  .append_child(Operation('Node By Label Scan', "(t:Team)")))))
+                                        .append_child(Operation('Project')
+                                                      .append_child(Operation('Conditional Traverse', "(t:Team)->(r:Rider)")
+                                                                    .append_child(Operation("Filter")
+                                                                                  .append_child(Operation('Node By Label Scan', "(t:Team)")))))
+                                        ))
+
+        self.assertEqual(result.structured_plan, expected)
+
+        redis_graph.delete()
+
     def test_query_timeout(self):
         redis_graph = Graph('timeout', self.r)
         # Build a sample graph with 1000 nodes.
