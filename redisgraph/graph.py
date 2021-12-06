@@ -219,7 +219,7 @@ class Graph:
     def execution_plan(self, query, params=None):
         """
         Get the execution plan for given query,
-        GRAPH.EXPLAIN returns an array of operations.
+        GRAPH.EXPLAIN returns ExecutionPlan object.
 
         Args:
             query: the query that will be executed
@@ -229,6 +229,21 @@ class Graph:
             query = self._build_params_header(params) + query
 
         plan = self.redis_con.execute_command("GRAPH.EXPLAIN", self.name, query)
+        return ExecutionPlan(plan)
+
+    def profile(self, query, params=None):
+        """
+        Get the profield execution plan for given query,
+        GRAPH.PROFILE returns ExecutionPlan object.
+
+        Args:
+            query: the query that will be executed
+            params: query parameters
+        """
+        if params is not None:
+            query = self._build_params_header(params) + query
+
+        plan = self.redis_con.execute_command("GRAPH.PROFILE", self.name, query)
         return ExecutionPlan(plan)
 
     def delete(self):
