@@ -2,6 +2,10 @@ import re
 
 
 class ProfileStats:
+    """
+    ProfileStats, runtime execution statistics of operation.
+    """
+
     def __init__(self, records_produced, execution_time):
         self.records_produced = records_produced
         self.execution_time = execution_time
@@ -43,7 +47,7 @@ class Operation:
         return (self.name == o.name and self.args == o.args)
 
     def __str__(self) -> str:
-        args_str = "" if self.args is None else " | " + " | ".join(self.args)
+        args_str = "" if self.args is None else " | " + self.args
         return f"{self.name}{args_str}"
 
 
@@ -151,7 +155,7 @@ class ExecutionPlan:
                 execution_time = float(re.search("Execution time: (\\d+.\\d+) ms", args[-1]).group(1))
                 profile_stats = ProfileStats(records_produced, execution_time)
                 args.pop(-1)
-            return Operation(name, None if len(args) == 0 else [arg.strip() for arg in args], profile_stats)
+            return Operation(name, None if len(args) == 0 else args[0].strip(), profile_stats)
 
         # iterate plan operations
         while i < len(self.plan):

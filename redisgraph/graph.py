@@ -219,7 +219,7 @@ class Graph:
     def execution_plan(self, query, params=None):
         """
         Get the execution plan for given query,
-        GRAPH.EXPLAIN returns an array of operations.
+        GRAPH.EXPLAIN returns ExecutionPlan object.
 
         Args:
             query: the query that will be executed
@@ -234,7 +234,7 @@ class Graph:
     def profile(self, query, params=None):
         """
         Get the profield execution plan for given query,
-        GRAPH.PROFILE returns an array of operations.
+        GRAPH.PROFILE returns ExecutionPlan object.
 
         Args:
             query: the query that will be executed

@@ -246,6 +246,7 @@ class TestStringMethods(base.TestCase):
 
     def test_execution_plan(self):
         redis_graph = Graph('execution_plan', self.r)
+        # graph creation / population
         create_query = """CREATE
                           (:Rider {name:'Valentino Rossi'})-[:rides]->(:Team {name:'Yamaha'}),
                           (:Rider {name:'Dani Pedrosa'})-[:rides]->(:Team {name:'Honda'}),
@@ -254,11 +255,11 @@ class TestStringMethods(base.TestCase):
 
         result = redis_graph.execution_plan("""MATCH (r:Rider)-[:rides]->(t:Team)
                                                WHERE t.name = $name
-                                               RETURN r.name, t.name, $params
+                                               RETURN r.name, t.name
                                                UNION
                                                MATCH (r:Rider)-[:rides]->(t:Team)
                                                WHERE t.name = $name
-                                               RETURN r.name, t.name, $params""", {'name': 'Yehuda'})
+                                               RETURN r.name, t.name""", {'name': 'Yamaha'})
         expected = '''\
 Results
     Distinct
@@ -292,47 +293,54 @@ Results
 
     def test_profile(self):
         redis_graph = Graph('profile', self.r)
-        create_query = """CREATE
-                          (:Rider {name:'Valentino Rossi'})-[:rides]->(:Team {name:'Yamaha'}),
-                          (:Rider {name:'Dani Pedrosa'})-[:rides]->(:Team {name:'Honda'}),
-                          (:Rider {name:'Andrea Dovizioso'})-[:rides]->(:Team {name:'Ducati'})"""
+        # graph creation / population
+        create_query = """UNWIND range(1, 30) as x CREATE (:Person {id: x})"""
         redis_graph.query(create_query)
 
-        result = redis_graph.profile("""MATCH (r:Rider)-[:rides]->(t:Team)
-                                        WHERE t.name = $name
-                                        RETURN r.name, t.name, $params
-                                        UNION
-                                        MATCH (r:Rider)-[:rides]->(t:Team)
-                                        WHERE t.name = $name
-                                        RETURN r.name, t.name, $params""", {'name': 'Yehuda'})
-        expected = '''\
-Results
-    Distinct
-        Join
-            Project
-                Conditional Traverse | (t:Team)->(r:Rider)
-                    Filter
-                        Node By Label Scan | (t:Team)
-            Project
-                Conditional Traverse | (t:Team)->(r:Rider)
-                    Filter
-                        Node By Label Scan | (t:Team)'''
-        self.assertEqual(str(result), expected)
+        plan = redis_graph.profile("""MATCH (p:Person)
+                                      WHERE p.id > 15
+                                      RETURN p""")
 
-        expected = Operation('Results') \
-            .append_child(Operation('Distinct')
-                          .append_child(Operation('Join')
-                                        .append_child(Operation('Project')
-                                                      .append_child(Operation('Conditional Traverse', "(t:Team)->(r:Rider)")
-                                                                    .append_child(Operation("Filter")
-                                                                                  .append_child(Operation('Node By Label Scan', "(t:Team)")))))
-                                        .append_child(Operation('Project')
-                                                      .append_child(Operation('Conditional Traverse', "(t:Team)->(r:Rider)")
-                                                                    .append_child(Operation("Filter")
-                                                                                  .append_child(Operation('Node By Label Scan', "(t:Team)")))))
-                                        ))
+        results = plan.structured_plan
+        self.assertEqual(results.name, "Results")
+        self.assertEqual(results.profile_stats.records_produced, 15)
+        self.assertGreater(results.profile_stats.execution_time, 0)
 
-        self.assertEqual(result.structured_plan, expected)
+        project = results.children[0]
+        self.assertEqual(project.name, "Project")
+        self.assertEqual(project.profile_stats.records_produced, 15)
+        self.assertGreater(project.profile_stats.execution_time, 0)
+
+        filter = project.children[0]
+        self.assertEqual(filter.name, "Filter")
+        self.assertEqual(filter.profile_stats.records_produced, 15)
+        self.assertGreater(filter.profile_stats.execution_time, 0)
+
+        node_by_label_scan = filter.children[0]
+        self.assertEqual(node_by_label_scan.name, "Node By Label Scan")
+        self.assertEqual(node_by_label_scan.profile_stats.records_produced, 30)
+        self.assertGreater(node_by_label_scan.profile_stats.execution_time, 0)
+
+        redis_graph.query("CREATE INDEX FOR (p:Person) ON (p.id)")
+
+        plan = redis_graph.profile("""MATCH (p:Person)
+                                      WHERE p.id > 15
+                                      RETURN p""")
+
+        results = plan.structured_plan
+        self.assertEqual(results.name, "Results")
+        self.assertEqual(results.profile_stats.records_produced, 15)
+        self.assertGreater(results.profile_stats.execution_time, 0)
+
+        project = results.children[0]
+        self.assertEqual(project.name, "Project")
+        self.assertEqual(project.profile_stats.records_produced, 15)
+        self.assertGreater(project.profile_stats.execution_time, 0)
+
+        node_by_index_scan = project.children[0]
+        self.assertEqual(node_by_index_scan.name, "Node By Index Scan")
+        self.assertEqual(node_by_index_scan.profile_stats.records_produced, 15)
+        self.assertGreater(node_by_index_scan.profile_stats.execution_time, 0)
 
         redis_graph.delete()
 
