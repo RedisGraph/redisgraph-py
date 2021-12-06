@@ -216,6 +216,9 @@ class Graph:
             # re-issue query
             return self.query(q, params, timeout, read_only)
 
+    def _execution_plan_to_string(self, plan):
+        return "\n".join(plan)
+
     def execution_plan(self, query, params=None):
         """
         Get the execution plan for given query,
