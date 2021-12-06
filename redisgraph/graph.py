@@ -216,9 +216,6 @@ class Graph:
             # re-issue query
             return self.query(q, params, timeout, read_only)
 
-    def _execution_plan_to_string(self, plan):
-        return "\n".join(plan)
-
     def execution_plan(self, query, params=None):
         """
         Get the execution plan for given query,
@@ -232,7 +229,7 @@ class Graph:
             query = self._build_params_header(params) + query
 
         plan = self.redis_con.execute_command("GRAPH.EXPLAIN", self.name, query)
-        return self._execution_plan_to_string(plan)
+        return "\n".join(plan)
 
     def explain(self, query, params=None):
         """
