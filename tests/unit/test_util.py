@@ -12,11 +12,12 @@ class TestUtils(base.TestCase):
 
     def test_quote_string(self):
         self.assertEqual(util.quote_string(10), 10)
-        self.assertEqual(util.quote_string("abc"), '"abc"')
-        self.assertEqual(util.quote_string(""), '""')
-        self.assertEqual(util.quote_string('\"'), '"\\\""')
-        self.assertEqual(util.quote_string('"'), '"\\""')
-        self.assertEqual(util.quote_string('a"a'), '"a\\"a"')
+        self.assertEqual(util.quote_string('abc'), '"abc"')
+        self.assertEqual(util.quote_string(''), '""')
+        self.assertEqual(util.quote_string('"'), r'"\""')
+        self.assertEqual(util.quote_string(r'foo \ bar'), r'"foo \\ bar"')
+        self.assertEqual(util.quote_string(r'foo \" bar'), r'"foo \\\" bar"')
+        self.assertEqual(util.quote_string('a"a'), r'"a\"a"')
 
     def test_stringify_param_value(self):
         cases = [

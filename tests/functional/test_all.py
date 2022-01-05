@@ -101,6 +101,29 @@ class TestStringMethods(base.TestCase):
         # All done, remove graph.
         redis_graph.delete()
 
+    def test_properties_with_escapes(self):
+        redis_graph = Graph('props', self.r)
+
+        message = r'This raw string has \ a backslash character in it.'
+        params = {'message': message}
+        query = """CREATE (:Foo {message: $message})"""
+        redis_graph.query(query, params)
+
+        query = """MATCH (u:Foo) RETURN u.message"""
+        result = redis_graph.query(query)
+        self.assertEqual(result.result_set[0][0], message)
+
+        message = r'This raw string has \" a quote preceded by backslash.'
+        params = {'message': message}
+        query = """CREATE (:Bar {message: $message})"""
+        redis_graph.query(query, params)
+
+        query = """MATCH (u:Bar) RETURN u.message"""
+        result = redis_graph.query(query)
+        self.assertEqual(result.result_set[0][0], message)
+
+        redis_graph.delete()
+
     def test_param(self):
         redis_graph = Graph('params', self.r)
 
