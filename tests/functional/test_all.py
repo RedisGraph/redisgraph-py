@@ -325,6 +325,25 @@ Results
 
         self.assertEqual(result.structured_plan, expected)
 
+        result = redis_graph.explain("""MATCH (r:Rider), (t:Team)
+                                        RETURN r.name, t.name""")
+        expected = '''\
+Results
+    Project
+        Cartesian Product
+            Node By Label Scan | (r:Rider)
+            Node By Label Scan | (t:Team)'''
+        self.assertEqual(str(result), expected)
+
+        expected = Operation('Results') \
+            .append_child(Operation('Project')
+                          .append_child(Operation('Cartesian Product')
+                                        .append_child(Operation('Node By Label Scan'))
+                                        .append_child(Operation('Node By Label Scan'))
+                                        ))
+
+        self.assertEqual(result.structured_plan, expected)
+
         redis_graph.delete()
 
     def test_profile(self):

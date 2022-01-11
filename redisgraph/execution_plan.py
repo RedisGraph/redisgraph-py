@@ -164,7 +164,11 @@ class ExecutionPlan:
             if op_level == level:
                 # if the operation level equal to the current level
                 # set the current operation and move next
-                current = _create_operation(current_op.split("|"))
+                child = _create_operation(current_op.split("|"))
+                if current:
+                    current = stack.pop()
+                    current.append_child(child)
+                current = child
                 i += 1
             elif op_level == level + 1:
                 # if the operation is child of the current operation
