@@ -54,8 +54,8 @@ class Node:
         if self.id is not None and rhs.id is not None and self.id != rhs.id:
             return False
 
-        # Label should match.
-        if self.label != rhs.label:
+        # Labels should match.
+        if self.labels != rhs.labels:
             return False
 
         # Quick check for number of properties.
