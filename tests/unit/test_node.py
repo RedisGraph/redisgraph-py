@@ -50,6 +50,12 @@ class TestNode(base.TestCase):
         self.assertNotEqual(node.Node(alias="a", label="l"),
                             node.Node(alias="a", label="l1"))
 
+        self.assertEqual(node.Node(alias="a", label=["a", "b"]),
+                         node.Node(alias="a", label=["a", "b"]))
+
+        self.assertNotEqual(node.Node(alias="a", label=["a", "b"]),
+                            node.Node(alias="a", label=["a", "c"]))
+
         self.assertEqual(node.Node(properties={"a": 10}),
                          node.Node(properties={"a": 10}))
         self.assertNotEqual(node.Node(), node.Node(properties={"a": 10}))
