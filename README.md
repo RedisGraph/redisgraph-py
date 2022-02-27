@@ -6,11 +6,16 @@
 [![Known Vulnerabilities](https://snyk.io/test/github/RedisGraph/redisgraph-py/badge.svg?targetFile=pyproject.toml)](https://snyk.io/test/github/RedisGraph/redisgraph-py?targetFile=pyproject.toml)
 [![Total alerts](https://img.shields.io/lgtm/alerts/g/RedisGraph/redisgraph-py.svg?logo=lgtm&logoWidth=18)](https://lgtm.com/projects/g/RedisGraph/redisgraph-py/alerts/)
 
-# redisgraph-py
+# RedisGraph python client
 [![Forum](https://img.shields.io/badge/Forum-RedisGraph-blue)](https://forum.redis.com/c/modules/redisgraph)
 [![Discord](https://img.shields.io/discord/697882427875393627?style=flat-square)](https://discord.gg/gWBRT6P)
 
-RedisGraph python client
+## Deprecation notice
+
+As of [redis-py 4.1.0](https://pypi.org/project/redis/4.1.0) this library is deprecated. It's features have been merged into redis-py. Please either install it [from pypy](https://pypi.org/project/redis) or [the repo](https://github.com/redis/redis-py).
+
+--------------------------------
+
 
 
 ## Example: Using the Python Client
