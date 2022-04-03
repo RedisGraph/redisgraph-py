@@ -25,7 +25,7 @@ repository = "https://github.com/RedisGraph/redisgraph-py"
 
 [tool.poetry.dependencies]
 python = "^3.6"
-redis = "^4.1.2"
+redis = "^4.2.1"
 hiredis = "^2.0.0"
 prettytable = "^2.1.0"
 
